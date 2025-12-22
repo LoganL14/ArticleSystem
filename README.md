@@ -25,3 +25,13 @@ This project automates the collection of scientific articles from https://arxiv.
 - LangChain for chunking and embeddings
 - Airflow or similar for scheduling
 - Git/GitHub for version control
+
+
+
+### Full Pipeline 
+1) Finds new arXiv papers (from two days ago, UTC).
+2) Downloads their PDFs into an organized folder structure.
+3) Extracts clean text from those PDFs.
+4) Chunks the text, then creates embeddings and summaries.
+5) Sends a daily email to team with specifics (titles, abstracts, links, and short summaries).
+6) Runs on a schedule (daily).

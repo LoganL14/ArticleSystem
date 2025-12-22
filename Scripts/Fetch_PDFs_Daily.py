@@ -110,6 +110,16 @@ def fetch_papers(search_query: str, paper_date: str):
             print(f"An error occurred during download: {e}")
     return downloaded
 
+from docling.document_converter import DocumentConverter
+
+
+
+
+
+def parse_pdf_to_markdown(fp_path: str) -> str:
+    converter = DocumentConverter()
+    result = converter.convert(fp_path)
+    return result.document.export_to_markdown()
 
 
 if __name__ == "__main__":
@@ -120,13 +130,33 @@ if __name__ == "__main__":
 
     #Call the function to build the search query
     search_query, start_utc_time = build_search_query(yesterday_midnight_utc, yesterday_end_utc)
-    #print(search_query, start_utc_time)
+    print(search_query, start_utc_time)
 
-    #get actual result from query, and download the resulting pdfs
+    #download the resulting pdfs, store the pdfs in a list "results"
     results = fetch_papers(search_query, start_utc_time)
-    print(results)
 
 
+
+#     download_folder_md = Path(f'./downloaded_papers_md/{start_utc_time}')
+#     download_folder_md.mkdir(parents=True, exist_ok=True)
+
+#     for pdf in results:
+#         base = Path(pdf).stem
+#         md_path = download_folder_md / f"{base}.md"
+#         try:
+#             md_text = parse_pdf_to_markdown(pdf)
+
+#         #
+#         #
+        
+#         except Exception as e:
+#             print(f"Docling parse failed for {pdf}: {e}")
+
+
+
+# for url in all_href_links:
+#         filename = url.split('/')[-1] + '.pdf'
+#         fp_path = download_folder / filename
 
 
 
