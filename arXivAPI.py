@@ -1,4 +1,3 @@
-
 #first learn how to use api
 #-gives atom xml response?
 # <feed>: The root element for the entire response.

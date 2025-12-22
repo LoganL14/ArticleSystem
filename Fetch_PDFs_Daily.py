@@ -20,7 +20,7 @@ BASE_URL = "https://export.arxiv.org/api/query"
 #change based on max amount of articles you want
 MAX_RESULTS = 50
 #change based on what you want articles to be about (delete to include all)
-search_term = "all:Technology"
+#search_term = "all:Technology"
 
 
 
@@ -87,7 +87,7 @@ def fetch_papers(search_query: str, paper_date: str):
     resp = requests.get(BASE_URL, params=params, timeout=60)
     resp.raise_for_status()
     #parses the XML string into a navigable tree
-    soup = BeautifulSoup(resp.text, 'xml')
+    soup = BeautifulSoup(resp.text, "xml")
     #Give me every <link> tag in the entire document
     all_entries = soup.find_all('link')
     # Extracts only those <link>s whose type="application/pdf", returning a list of PDF URLs (https://arxiv.org/pdf/2512.12345v1)
@@ -97,6 +97,7 @@ def fetch_papers(search_query: str, paper_date: str):
     download_folder = Path(f'./downloaded_papers/{paper_date}')
     download_folder.mkdir(parents=True, exist_ok=True)
     #naming each pdf that is downloaded
+    downloaded = []
     for url in all_href_links:
         filename = url.split('/')[-1] + '.pdf'
         fp_path = download_folder / filename
@@ -110,8 +111,10 @@ def fetch_papers(search_query: str, paper_date: str):
                     if chunk:
                         f.write(chunk)
             print(f"Successfully downloaded: {filename}")
+            downloaded.append(str(fp_path))
         except requests.exceptions.RequestException as e:
             print(f"An error occurred during download: {e}")
+    return downloaded
 
 
 
@@ -119,16 +122,15 @@ if __name__ == "__main__":
 
     #Get the dates that will be used to query later
     yesterday_midnight_utc, yesterday_end_utc, yday_label = get_utc_times_for_2daysago()
-    #print(yesterday_midnight_utc, yesterday_end_utc, yday_label)
+    print(yesterday_midnight_utc, yesterday_end_utc, yday_label)
 
     #Call the function to build the search query
     search_query, start_utc_time = build_search_query(yesterday_midnight_utc, yesterday_end_utc)
-    
+    print(search_query, start_utc_time)
 
     #get actual result from query, and download the resulting pdfs
-    results = fetch_papers(search_query, start_utc_time)
-    print(results)
-
+    #results = fetch_papers(search_query, start_utc_time)
+    #print(results)
 
 
 

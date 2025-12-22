@@ -1,9 +1,8 @@
-
 # # For advanced query syntax documentation, see the arXiv API User Manual:
 # # https://arxiv.org/help/api/user-manual#query_details
 
-
 import arxiv
+
 # Construct the default API client. Handle communication with the API
 client = arxiv.Client()
 
