@@ -8,13 +8,15 @@ import requests
 #work with dates, +/-, etc
 from datetime import datetime, timedelta
 #function formatting, -> 
-from typing import Optional, Tuple
+from typing import Optional, Iterable, Tuple
 #work with specific timezones
 from zoneinfo import ZoneInfo
 #to pull from xml request, the data I need (PDFs)
 from bs4 import BeautifulSoup
 #Representing file and directory paths
 from pathlib import Path
+#Docling to go from PDFs to md
+from docling.document_converter import DocumentConverter
 
 
 
@@ -27,14 +29,14 @@ def get_utc_times_for_2daysago() -> Tuple[datetime, datetime, str]:
     # Specify time zone, subtract 2 days off of current day. Replace with 12:00am and 11:59pm of that day
     tz = ZoneInfo("UTC")
     now_utc = datetime.now(tz) - timedelta(days=3)
-    yesterday_midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
-    yesterday_end_utc = now_utc.replace(hour=23, minute=59, second=59, microsecond=0)
+    twodaysago_midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+    twodaysago_end_utc = now_utc.replace(hour=23, minute=59, second=59, microsecond=0)
     # clean way to look at the day you are looking at
-    yday_label = str(yesterday_midnight_utc.date())
+    yday_label = str(twodaysago_midnight_utc.date())
 
-    return yesterday_midnight_utc, yesterday_end_utc, yday_label
+    return twodaysago_midnight_utc, twodaysago_end_utc, yday_label
 
-def build_search_query(yesterday_midnight_utc : datetime, yesterday_end_utc : datetime, search_term=None) -> Tuple[str, str] :
+def build_search_query(twodaysago_midnight_utc : datetime, twodaysago_end_utc : datetime, search_term=None) -> Tuple[str, str] :
     """Build a search query with date range and other information (optional).
 
     Args:
@@ -48,8 +50,8 @@ def build_search_query(yesterday_midnight_utc : datetime, yesterday_end_utc : da
 
     #format the dates for query. 202512170000
     fmt = "%Y%m%d%H%M"
-    start_utc_format =  yesterday_midnight_utc.strftime(fmt)
-    end_utc_format  =  yesterday_end_utc.strftime(fmt)
+    start_utc_format =  twodaysago_midnight_utc.strftime(fmt)
+    end_utc_format  =  twodaysago_end_utc.strftime(fmt)
     #build the date query. Example - submittedDate:[202512170000 TO 202512180000] 
     date_query = f"submittedDate:[{start_utc_format} TO {end_utc_format}]"
     
@@ -91,7 +93,7 @@ def fetch_papers(search_query: str, paper_date: str):
     download_folder = Path(f'./downloaded_papers/{paper_date}')
     download_folder.mkdir(parents=True, exist_ok=True)
     #naming each pdf that is downloaded
-    downloaded = []
+    resultspdf = []
     for url in all_href_links:
         filename = url.split('/')[-1] + '.pdf'
         fp_path = download_folder / filename
@@ -105,59 +107,54 @@ def fetch_papers(search_query: str, paper_date: str):
                     if chunk:
                         f.write(chunk)
             print(f"Successfully downloaded: {filename}")
-            downloaded.append(str(fp_path))
+            resultspdf.append(str(fp_path))
         except requests.exceptions.RequestException as e:
             print(f"An error occurred during download: {e}")
-    return downloaded
-
-from docling.document_converter import DocumentConverter
+    return resultspdf
 
 
 
-
-
-def parse_pdf_to_markdown(fp_path: str) -> str:
+def parse_pdf_to_markdown(resultspdf: Iterable[str], start_utc_time: str) -> list[str]:
+    """
+    Convert a batch of PDF files to Markdown and save them into `out_dir`.
+    
+    Returns:
+        list[str]: Paths to successfully written Markdown files
+    """
+    download_folder_md = Path(f'./downloaded_papers_md/{start_utc_time}')
+    download_folder_md.mkdir(parents=True, exist_ok=True)
     converter = DocumentConverter()
-    result = converter.convert(fp_path)
-    return result.document.export_to_markdown()
+    downloadedmd = []
+    for fp_path in resultspdf:
+        base = Path(fp_path).stem
+        md_path = download_folder_md / f"{base}.md"
+        try: 
+            md_text = converter.convert(fp_path)
+            md_final = md_text.document.export_to_markdown()
+            md_path.write_text(md_final, encoding="utf-8")
+            print(f"Saved Markdown: {md_path}")
+            downloadedmd.append(str(md_path))
+        except Exception as e:
+            print(f"Failed to save Markdown for {fp_path}: {e}")
+    return downloadedmd
+    
+
 
 
 if __name__ == "__main__":
 
     #Get the dates that will be used to query later
-    yesterday_midnight_utc, yesterday_end_utc, yday_label = get_utc_times_for_2daysago()
+    twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
     #print(yesterday_midnight_utc, yesterday_end_utc, yday_label)
 
     #Call the function to build the search query
-    search_query, start_utc_time = build_search_query(yesterday_midnight_utc, yesterday_end_utc)
+    search_query, start_utc_time = build_search_query(twodaysago_midnight_utc, twodaysago_end_utc)
     print(search_query, start_utc_time)
 
     #download the resulting pdfs, store the pdfs in a list "results"
-    results = fetch_papers(search_query, start_utc_time)
+    resultspdf = fetch_papers(search_query, start_utc_time)
 
-
-
-#     download_folder_md = Path(f'./downloaded_papers_md/{start_utc_time}')
-#     download_folder_md.mkdir(parents=True, exist_ok=True)
-
-#     for pdf in results:
-#         base = Path(pdf).stem
-#         md_path = download_folder_md / f"{base}.md"
-#         try:
-#             md_text = parse_pdf_to_markdown(pdf)
-
-#         #
-#         #
-        
-#         except Exception as e:
-#             print(f"Docling parse failed for {pdf}: {e}")
-
-
-
-# for url in all_href_links:
-#         filename = url.split('/')[-1] + '.pdf'
-#         fp_path = download_folder / filename
-
+    resultsmd = parse_pdf_to_markdown(resultspdf, start_utc_time)
 
 
 """ NOTES """
