@@ -1,18 +1,12 @@
 #Focus on semantic chunks (paragraph/sentence-aware) 
 #keep chunks within reasonable token limits for your embedding model (often 500–1,000 tokens).
-
 #Pick your embedding model (OpenAI, HuggingFace, etc.) and store vectors in a local index (FAISS/Chroma) or a managed service (Pinecone). 
 # Include metadata per chunk: paper_id, title, authors, section, page_range md_path and maybe the original pdf_path
-
 #“Text chunking for embeddings”
-
 # Explains why you split text into smaller, semantically coherent pieces for better embedding quality.
 # Covers token limits and chunk size trade-offs.
-
 # “Semantic chunking vs fixed-size chunking”
-
 # Shows why splitting by sentences or paragraphs is better than blindly cutting every N characters.
-
 # Working with research papers , the goal is to summarize
 
 
@@ -39,12 +33,8 @@
 #       metadata.json
 #     ...
 
-
 # Embedding models
-#MiniLM-L6-v2
-#E5-Base-v2
-#BGE-Base-v1.5
-#Nomic-Embed-v1
+#MiniLM-L6-v2 , E5-Base-v2 , BGE-Base-v1.5 ,Nomic-Embed-v1
 
 
 from pathlib import Path
@@ -56,19 +46,19 @@ def load_markdown(md_file: str) -> str:
     """Read the Markdown file as a single string."""
     return Path(md_file).read_text(encoding="utf-8")
 
-def chunk_by_size(text: str, max_chars: int = 2000) -> list[str]:
-    """
-    Split text into chunks, each up to max_chars characters.
-    This is a naive splitter: it doesn't try to respect sentences/paragraphs.
-    """
-    chunks = []
-    start = 0
-    n = len(text)
-    while start < n:
-        end = min(start + max_chars, n)
-        chunks.append(text[start:end])
-        start = end
-    return chunks
+# def chunk_by_size(text: str, max_chars: int = 2000) -> list[str]:
+#     """
+#     Split text into chunks, each up to max_chars characters.
+#     This is a naive splitter: it doesn't try to respect sentences/paragraphs.
+#     """
+#     chunks = []
+#     start = 0
+#     n = len(text)
+#     while start < n:
+#         end = min(start + max_chars, n)
+#         chunks.append(text[start:end])
+#         start = end
+#     return chunks
 
 
 def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 0) -> list[str]:
@@ -83,12 +73,13 @@ def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 0) -> list[
     chunks = markdown_splitter.split_text(text)
     return chunks
 
+
 #NOW CREATE EMBEDDINGS 
 # try MiniLM-L6-v2
 
 emb_model = HuggingFaceBgeEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2" )
-result = emb_model.embed_query("This is a test application")
-print(result)
+#result = emb_model.embed_query("This is a test application")
+#print(result)
 
 
 if __name__ == "__main__":
@@ -102,13 +93,30 @@ if __name__ == "__main__":
     
 
     #populate the Dictonary with key [file path] and value [chunk 1, chunk 2, etc]
+    # chunks = chunk_by_size(raw_text) 
+    # print(f"[Naive Split] Total chunks: {len(chunks)}")
+    # all_chunks[md_file] = chunks
+    # #print(all_chunks)
     
-    chunks = chunk_by_size(raw_text) 
-    print(f"[Naive Split] Total chunks: {len(chunks)}")
-    all_chunks[md_file] = chunks
-    #print(all_chunks)
-    
+
+    #List of strs, each element is a chunk  
+# [
+#     "Chunk 1 text here...",
+#     "Chunk 2 text here...",
+#     "Chunk 3 text here..."
+# ]
     chunksMD = chunk_langchain(raw_text)
+    #print(chunksMD)
     print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
     all_chunks_md[md_file] = chunksMD
     #print(all_chunks_md)
+
+    # take a list of texts (documents/passages) and returns a list of embeddings (vectors)
+# [
+#     [0.0123, -0.0412, 0.0781, ..., 0.0035],  # embedding for chunk 1
+#     [0.0099, -0.0557, 0.0620, ..., 0.0102],  # embedding for chunk 2
+#     [0.0141, -0.0321, 0.0832, ..., -0.0017]  # embedding for chunk 3
+# ]
+
+    resultchunksemb = emb_model.embed_documents(chunksMD)
+    print(resultchunksemb)

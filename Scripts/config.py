@@ -13,7 +13,9 @@ DATE_FMT_API: str = "%Y%m%d%H%M"  # format arXiv expects in submittedDate rang
 
 # I/O Directories
 DOWNLOAD_ROOT: str = "./downloaded_papers"         
-MARKDOWN_ROOT: str = "./downloaded_papers_md"      
+MARKDOWN_ROOT: str = "./downloaded_papers_md"  
+EMBEDDINGS_ROOT: str = "./downloaded_embeddings"
+    
 # Chunking / Splitting
 CHUNK_SIZE_CHARS: int = 2000
 CHUNK_OVERLAP_CHARS: int = 0
