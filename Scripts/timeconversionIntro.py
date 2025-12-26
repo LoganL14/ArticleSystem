@@ -27,13 +27,6 @@ print(end_utc_formatted)
 
 
 
-
-
-
-
-
-
-
 # start_local = datetime(now_local.year, now_local.month, now_local.day, 0, 0, tzinfo=tz)
 # end_local = start_local + timedelta(days=1)
 

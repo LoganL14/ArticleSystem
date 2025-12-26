@@ -2,7 +2,7 @@
 
 """ Packages to download"""
 #uses config.py to bring in necessary global arguments
-from config import BASE_URL, MAX_RESULTS, search_term
+from config import BASE_URL, MAX_RESULTS, search_term, REQUEST_TIMEOUT, TZ_NAME, DAYS_OFFSET, DATE_FMT_API, DOWNLOAD_ROOT, MARKDOWN_ROOT
 #this lets you extract information from an API
 import requests
 #work with dates, +/-, etc
@@ -27,8 +27,8 @@ def get_utc_times_for_2daysago() -> Tuple[datetime, datetime, str]:
       tuple: (start_utc, end_utc, day_label)
     """
     # Specify time zone, subtract 2 days off of current day. Replace with 12:00am and 11:59pm of that day
-    tz = ZoneInfo("UTC")
-    now_utc = datetime.now(tz) - timedelta(days=3)
+    tz = ZoneInfo(TZ_NAME)
+    now_utc = datetime.now(tz) - timedelta(days=DAYS_OFFSET)
     twodaysago_midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
     twodaysago_end_utc = now_utc.replace(hour=23, minute=59, second=59, microsecond=0)
     # clean way to look at the day you are looking at
@@ -49,9 +49,9 @@ def build_search_query(twodaysago_midnight_utc : datetime, twodaysago_end_utc : 
     """
 
     #format the dates for query. 202512170000
-    fmt = "%Y%m%d%H%M"
-    start_utc_format =  twodaysago_midnight_utc.strftime(fmt)
-    end_utc_format  =  twodaysago_end_utc.strftime(fmt)
+
+    start_utc_format =  twodaysago_midnight_utc.strftime(DATE_FMT_API)
+    end_utc_format  =  twodaysago_end_utc.strftime(DATE_FMT_API)
     #build the date query. Example - submittedDate:[202512170000 TO 202512180000] 
     date_query = f"submittedDate:[{start_utc_format} TO {end_utc_format}]"
     
@@ -80,7 +80,7 @@ def fetch_papers(search_query: str, paper_date: str):
     params = {"search_query" : search_query ,
           "max_results" : MAX_RESULTS}
     # send request
-    resp = requests.get(BASE_URL, params=params, timeout=60)
+    resp = requests.get(BASE_URL, params=params, timeout=REQUEST_TIMEOUT)
     resp.raise_for_status()
     #parses the XML string into a navigable tree
     soup = BeautifulSoup(resp.text, "xml")
@@ -90,7 +90,7 @@ def fetch_papers(search_query: str, paper_date: str):
     # i['href'] pulls the URL out of the attribute
     all_href_links = [i['href'] for i in all_entries if i.get('type') == 'application/pdf']
     # Download the papers into specific folder 
-    download_folder = Path(f'./downloaded_papers/{paper_date}')
+    download_folder = Path(DOWNLOAD_ROOT) / paper_date
     download_folder.mkdir(parents=True, exist_ok=True)
     #naming each pdf that is downloaded
     resultspdf = []
@@ -121,7 +121,8 @@ def parse_pdf_to_markdown(resultspdf: Iterable[str], start_utc_time: str) -> lis
     Returns:
         list[str]: Paths to successfully written Markdown files
     """
-    download_folder_md = Path(f'./downloaded_papers_md/{start_utc_time}')
+    download_folder_md = Path(MARKDOWN_ROOT) / start_utc_time
+    Path(MARKDOWN_ROOT) / start_utc_time
     download_folder_md.mkdir(parents=True, exist_ok=True)
     converter = DocumentConverter()
     downloadedmd = []

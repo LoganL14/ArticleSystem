@@ -50,6 +50,7 @@
 from pathlib import Path
 from typing import Iterable, List, Dict
 from langchain_text_splitters import MarkdownTextSplitter
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 
 def load_markdown(md_file: str) -> str:
     """Read the Markdown file as a single string."""
@@ -83,7 +84,11 @@ def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 0) -> list[
     return chunks
 
 #NOW CREATE EMBEDDINGS 
+# try MiniLM-L6-v2
 
+emb_model = HuggingFaceBgeEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2" )
+result = emb_model.embed_query("This is a test application")
+print(result)
 
 
 if __name__ == "__main__":

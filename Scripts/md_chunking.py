@@ -2,6 +2,7 @@ from pathlib import Path
 from Fetch_PDFs_Daily import get_utc_times_for_2daysago, build_search_query
 from typing import Iterable, List, Dict
 from langchain_text_splitters import MarkdownTextSplitter
+from config import CHUNK_SIZE_CHARS, CHUNK_OVERLAP_CHARS, MAX_CHARS, OVERLAP
 
 
 #Need to get the md files that were grabbed today. (Involves reusing the get_utc_times_for_2daysago(), build_search_query() functions )
@@ -39,13 +40,13 @@ def load_markdown(md_file: str) -> str:
 #     return chunks
 
 
-def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 0) -> list[str]:
+def chunk_langchain(text: str, MAX_CHARS, OVERLAP) -> list[str]:
     """
     Split text into chunks (USING LANGCHAIN INSTEAD), each up to max_chars characters.
     """
     markdown_splitter = MarkdownTextSplitter(
-        chunk_size = max_chars,
-        chunk_overlap = overlap
+        chunk_size = MAX_CHARS,
+        chunk_overlap = OVERLAP
     )
     docs = markdown_splitter.create_documents([text])
     chunks = markdown_splitter.split_text(text)
