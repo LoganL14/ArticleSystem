@@ -47,15 +47,20 @@
 #Nomic-Embed-v1
 
 
+#uses config.py to bring in necessary global arguments
+from config import CHUNK_SIZE_CHARS, CHUNK_OVERLAP_CHARS, EMBEDDING_MODEL_NAME
+
+
 from pathlib import Path
 from typing import Iterable, List, Dict
 from langchain_text_splitters import MarkdownTextSplitter
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 
 def load_markdown(md_file: str) -> str:
     """Read the Markdown file as a single string."""
     return Path(md_file).read_text(encoding="utf-8")
 
-def chunk_by_size(text: str, max_chars: int = 2000) -> list[str]:
+def chunk_by_size(text: str, CHUNK_SIZE_CHARS) -> list[str]:
     """
     Split text into chunks, each up to max_chars characters.
     This is a naive splitter: it doesn't try to respect sentences/paragraphs.
@@ -64,46 +69,43 @@ def chunk_by_size(text: str, max_chars: int = 2000) -> list[str]:
     start = 0
     n = len(text)
     while start < n:
-        end = min(start + max_chars, n)
+        end = min(start + CHUNK_SIZE_CHARS, n)
         chunks.append(text[start:end])
         start = end
     return chunks
 
 
-def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 0) -> list[str]:
+def chunk_langchain(text: str, CHUNK_SIZE_CHARS, CHUNK_OVERLAP_CHARS) -> list[str]:
     """
     Split text into chunks (USING LANGCHAIN INSTEAD), each up to max_chars characters.
     """
     markdown_splitter = MarkdownTextSplitter(
-        chunk_size = max_chars,
-        chunk_overlap = overlap
+        chunk_size = CHUNK_SIZE_CHARS,
+        chunk_overlap = CHUNK_OVERLAP_CHARS
     )
     docs = markdown_splitter.create_documents([text])
     chunks = markdown_splitter.split_text(text)
     return chunks
 
-#NOW CREATE EMBEDDINGS 
 
-
-
-if __name__ == "__main__":
+# if __name__ == "__main__":
     
-    #Create a Dictonary with key:str and value:List
-    all_chunks: Dict[str, List[str]] = {}
-    all_chunks_md: Dict[str, List[str]] = {}
+    # #Create a Dictonary with key:str and value:List
+    # all_chunks: Dict[str, List[str]] = {}
+    # all_chunks_md: Dict[str, List[str]] = {}
     
-    md_file = 'downloaded_papers_md\\202512200000\\2512.18524v1.md'
-    raw_text = load_markdown(md_file)
+    # md_file = 'downloaded_papers_md\\202512200000\\2512.18524v1.md'
+    # raw_text = load_markdown(md_file)
     
 
-    #populate the Dictonary with key [file path] and value [chunk 1, chunk 2, etc]
+    # #populate the Dictonary with key [file path] and value [chunk 1, chunk 2, etc]
     
-    chunks = chunk_by_size(raw_text) 
-    print(f"[Naive Split] Total chunks: {len(chunks)}")
-    all_chunks[md_file] = chunks
-    #print(all_chunks)
+    # chunks = chunk_by_size(raw_text) 
+    # print(f"[Naive Split] Total chunks: {len(chunks)}")
+    # all_chunks[md_file] = chunks
+    # #print(all_chunks)
     
-    chunksMD = chunk_langchain(raw_text)
-    print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
-    all_chunks_md[md_file] = chunksMD
-    #print(all_chunks_md)
+    # chunksMD = chunk_langchain(raw_text)
+    # print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
+    # all_chunks_md[md_file] = chunksMD
+    # #print(all_chunks_md)

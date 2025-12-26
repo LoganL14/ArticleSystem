@@ -1,19 +1,18 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-#pip install tzdata
+
 
 
 # Get current time in Los Angeles
-tz = ZoneInfo("America/Los_Angeles")
-now_local = datetime.now(tz)
-yesterday_local = now_local - timedelta(days = 1)
+tz = ZoneInfo("UTC")
+now_time = datetime.now(tz)
+twodaysago_time= now_local - timedelta(days = 2)
 #print(now_local)
 
 
 #convert to UTC time
-
-start_utc = yesterday_local.astimezone(ZoneInfo("GMT"))
-end_utc   = now_local.astimezone(ZoneInfo("GMT"))
+start_utc = now_time.astimezone(ZoneInfo("GMT"))
+end_utc   = twodaysago_time.astimezone(ZoneInfo("GMT"))
 #print(start_utc, end_utc)
 
 
@@ -22,14 +21,8 @@ fmt = "%Y%m%d%H%M"
 
 start_utc_formatted =  start_utc.strftime(start_utc)
 end_utc_formatted =  end_utc.strftime(end_utc)
-print(start_utc_formatted )
+print(start_utc_formatted)
 print(end_utc_formatted)
-
-
-
-
-
-
 
 
 
