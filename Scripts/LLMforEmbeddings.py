@@ -1,5 +1,5 @@
 from pathlib import Path
-from Fetch_PDFs_Daily import get_utc_times_for_2daysago, build_search_query
+from Scripts.Fetch_PDFs_MDs_Daily import get_utc_times_for_2daysago, build_search_query
 from typing import Iterable, List, Dict
 from langchain_text_splitters import MarkdownTextSplitter
 from config import CHUNK_SIZE_CHARS, CHUNK_OVERLAP_CHARS, MAX_CHARS, OVERLAP, DOWNLOAD_ROOT, MARKDOWN_ROOT, EMBEDDINGS_ROOT
