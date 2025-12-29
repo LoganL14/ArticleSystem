@@ -17,7 +17,9 @@ MARKDOWN_ROOT: str = "./downloaded_papers_md"
 EMBEDDINGS_ROOT: str = "./downloaded_embeddings"
     
 # Chunking / Splitting
-CHUNK_SIZE_CHARS: int = 2000
-CHUNK_OVERLAP_CHARS: int = 0
 MAX_CHARS: int = 2000
 OVERLAP: int = 0
+
+
+# Embedding 
+EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"

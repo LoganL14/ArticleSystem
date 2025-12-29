@@ -1,4 +1,5 @@
-""" Script to collect pdfs of all of the previous days articles. /downloaded_papers folder"""
+""" Script to collect pdfs from articles posted 2 days ago. Put them into . /downloaded_papers folder
+    Also, take the pdfs and convert them into markdown files. Put them into . /downloaded_papers_md folder"""
 
 """ Packages to download"""
 #uses config.py to bring in necessary global arguments
