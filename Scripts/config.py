@@ -9,7 +9,7 @@ REQUEST_TIMEOUT: int = 60
 
 # Date / Time
 TZ_NAME: str = "UTC"         
-DAYS_OFFSET: int = 5         
+DAYS_OFFSET: int = 6         
 DATE_FMT_API: str = "%Y%m%d%H%M"  # format arXiv expects in submittedDate rang
 
 # Directories
@@ -18,8 +18,11 @@ MARKDOWN_ROOT: str = "./downloaded_papers_md"
 EMBEDDINGS_ROOT: str = "./downloaded_embeddings"
     
 # Chunking
-MAX_CHARS: int = 2000
+MAX_CHARS: int = 1400
 OVERLAP: int = 0
 
 # Embedding 
-EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+# model has max tokens of 216, and fixed vector size of 384 dimensions
+#EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+# model has max tokens of 512
+EMB_MODEL = "BAAI/bge-small-en-v1.5"

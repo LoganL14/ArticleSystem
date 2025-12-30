@@ -55,7 +55,6 @@ def chunk_langchain(text: str, MAX_CHARS, OVERLAP) -> List[str]:
         chunk_size = MAX_CHARS,
         chunk_overlap = OVERLAP
     )
-    docs = markdown_splitter.create_documents([text])
     chunks = markdown_splitter.split_text(text)
     return chunks
 
@@ -87,8 +86,6 @@ def save_embeddings_and_metadata(chunks: List[str], md_file: str, start_utc_time
         for i, chunk_text in enumerate(chunks):
             row = {
                 "paper_id": base,
-                "title": "",          # optional; fill later if you have it
-                "url": "",            # optional; add arXiv if desired
                 "md_path": md_file,
                 "chunk_id": f"{base}-{i:04d}",
                 "chunk_index": i,
@@ -114,7 +111,7 @@ if __name__ == "__main__":
     #for each md file. You will see "Total Chunks: X", npy file saved and its shape, .jsonl file saved and rows 
     for md_file in md_files:
         text = load_markdown(md_file)
-        chunksMD = chunk_langchain(text, MAX_CHARS, OVERLAP)  # try 1000, 1500, 2000, etc.
+        chunksMD = chunk_langchain(text, MAX_CHARS, OVERLAP)
         print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
         save_embeddings_and_metadata(chunksMD, md_file, start_utc_time)
         
