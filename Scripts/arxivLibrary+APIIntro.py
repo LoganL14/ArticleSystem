@@ -1,28 +1,28 @@
 # # For advanced query syntax documentation, see the arXiv API User Manual:
 # # https://arxiv.org/help/api/user-manual#query_details
 
-import arxiv
+# import arxiv
 
-# Construct the default API client. Handle communication with the API
-client = arxiv.Client()
+# # Construct the default API client. Handle communication with the API
+# client = arxiv.Client()
 
-# .Search, which will define query. "query" - articles containing the word. "max_results" - when to stop, "sort_by" - date
-# query checks - Title , Abstract , Author names , Comments (like “submitted to XYZ conference”)
-search = arxiv.Search(
-  query = "submittedDate:[202512170000 TO 202512172359]",
-  max_results = 10,
-  sort_by = arxiv.SortCriterion.SubmittedDate
-)
+# # .Search, which will define query. "query" - articles containing the word. "max_results" - when to stop, "sort_by" - date
+# # query checks - Title , Abstract , Author names , Comments (like “submitted to XYZ conference”)
+# search = arxiv.Search(
+#   query = "submittedDate:[202512170000 TO 202512172359]",
+#   max_results = 10,
+#   sort_by = arxiv.SortCriterion.SubmittedDate
+# )
 
-#actually sends the request, returns a "generator" of objects. each result gets one paper (title, summary, authors, published, pdf_url.. )
-#generator that will produce arxiv.Result objects when you iterate over it.
-# r.title, r.summary, r.authors, r.published, r.entry_id, r.links, r.pdf_url,etc
-results = client.results(search)
+# #actually sends the request, returns a "generator" of objects. each result gets one paper (title, summary, authors, published, pdf_url.. )
+# #generator that will produce arxiv.Result objects when you iterate over it.
+# # r.title, r.summary, r.authors, r.published, r.entry_id, r.links, r.pdf_url,etc
+# results = client.results(search)
 
-print([r for r in results])
+# print([r for r in results])
 
-#for r in results:
-    #print(r)
+# #for r in results:
+#     #print(r)
 
 
 
@@ -70,6 +70,7 @@ print([r for r in results])
 import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from pathlib import Path
 base_url = "http://export.arxiv.org/api/query"
 
 
@@ -85,8 +86,9 @@ yday_label = str(twodaysago_midnight_utc.date())
 
 #format for query
 fmt = "%Y%m%d%H%M"
-start_utc_formatted =  twodaysago_midnight_utc.strftime(fmt)
-end_utc_formatted =  twodaysago_end_utc.strftime(fmt)
+start_utc_format =  twodaysago_midnight_utc.strftime(fmt)
+end_utc_format =  twodaysago_end_utc.strftime(fmt)
+print(start_utc_format)
 
 time = "submittedDate:[{start_utc_formatted} TO {end_utc_formatted}]"
 
@@ -94,7 +96,7 @@ query = f"all:* AND {time}"
 #print(query)
 #"all:*+AND+submittedDate:[202512162300+TO+202512172300]"
 
-params = {"search_query" : "submittedDate:[202512170000 TO 202512172359]" ,
+params = {"search_query" : "submittedDate:[202512170000 TO 202512182359]" ,
           "max_results" : 10}
 
 
@@ -103,8 +105,59 @@ params = {"search_query" : "submittedDate:[202512170000 TO 202512172359]" ,
 def allarticles():
     
     response = requests.get(base_url, params=params)
-    print(response.text)
+    response.raise_for_status()
+    #print(response.text)
     
+    #use soup so you can access just specific parts of the xml
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(response.text, "xml")
+    all_entries = soup.find_all("link") 
+    #print(all_entries)
+
+    #now that I have just the links... I want to be able to grab just the pdf file path
+    pdf_links = []
+    for i in all_entries:
+        if i.get("type") == "application/pdf":
+            pdf_links.append(i["href"])
+
+    #much cleaner and faster way to do this
+    all_href_links = [i['href'] for i in all_entries if i.get('type') == 'application/pdf']
+    print(all_href_links)
+
+    download_folder_TEST = Path("./downloaded_papers_TEST") / start_utc_format
+    #print(download_folder_TEST)
+    download_folder_TEST.mkdir(parents=True, exist_ok=True)
+    
+    resultspdf = []
+    for url in all_href_links:
+      file_name = url.split('/')[-1] + ".pdf"
+      fp_path = download_folder_TEST / file_name  #complete path downloaded_papers_TEST\202512270000\2512.15197v1.pdf
+      print(f"Attempting to download {file_name} to {fp_path}...")
+      try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+        fp_path.write_bytes(response.content)
+        print(f"[DOWNLOADED] {file_name} -> {fp_path}")
+      except requests.exceptions.RequestException as e:
+        print(f"An error occurred during download: {e}")
+
+
+ 
+# fp_path.write_bytes(response.content)
+#         print(f"[DOWNLOADED] {file_name} -> {fp_path}")
+#       except requests.exceptions.RequestException as e:
+#         print(f"An error occurred during download: {e}")
+  
+
+#             with open(fp_path, 'wb') as f:    #opens the file path , and says 'wb' - write binary. , do as "f"
+#                 for chunk in response.iter_content(chunk_size=8192):
+#                     if chunk:
+#                         f.write(chunk)
+#             print(f"Successfully downloaded: {filename}")
+#             resultspdf.append(str(fp_path))
+#         except requests.exceptions.RequestException as e:
+#             print(f"An error occurred during download: {e}")
+
 
 allarticles()
 
