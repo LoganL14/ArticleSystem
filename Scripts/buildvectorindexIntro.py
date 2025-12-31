@@ -1,6 +1,3 @@
-""" Script to get all of the embedding npy files and metadata jsonl files that were put into . /downloaded_embeddings folder  (todays search)
-    Now do I need to pick an LLM to process these somehow?
-    Embed the query → compare it (cosine similarity) against all saved chunk embeddings → take the top k chunks → (optionally) pass those to an LLM to summarize."""
 
 #Representing file and directory paths
 from pathlib import Path
@@ -12,6 +9,11 @@ from typing import List, Dict
 from config import MAX_CHARS, OVERLAP, DOWNLOAD_ROOT, MARKDOWN_ROOT, EMBEDDINGS_ROOT
 #used for embedding / vector use
 import numpy as np
+
+
+import chromadb
+from chromadb.config import Settings
+import faiss
 
 
 def get_start_utc_time() -> str:
@@ -42,15 +44,52 @@ def load_embeddings(embed_file: str) -> np.ndarray:
 #      return 
 
 
+
+
+
 if __name__ == "__main__":
 
     start_utc_time = get_start_utc_time()
 
     embed_files = get_embed_files(start_utc_time)
-
     meta_files = get_meta_files(start_utc_time)
 
+    print(f"Found {len(embed_files)} .npy files")
 
-    print(embed_files)
-    print(meta_files)
+
+# Concatenate all vectors → normalize → build FAISS IndexFlatIP → 
+# query with a normalized embedding → get top‑k row indices.
+
+all_vecs = []
+for npy_file in embed_files:
+    X = load_embeddings(npy_file)
+    all_vecs.append(X)
+
+X_all = np.vstack(all_vecs)
+print(f"Global shape: {X_all.shape}")
+
+norms = np.linalg.norm(X_all, axis=1, keepdims = True)
+Xn = X_all / np.maximum(norms, 1e-12)
+
+d = Xn.shape[1]
+index = faiss.IndexFlatIP(d)
+index.add(Xn)
+print(f"Index size: {index.ntotal}")
+
+query = np.random.randn(d)
+query /= np.linalg.norm(query)
+
+k = 5
+scores, indices = index.search(query.reshape(1,-1), k)
+print("Top-k indices:", indices[0])
+print("Scores:", scores[0])
+
+# chroma_client = chromadb.EphemeralClient()
+# chroma_collection = chroma_client.create_collection()
+
+# chroma_collection.add(
+#     ids = [str(i) for i in range(len(embed_files))],
+#     embeddings = embeddings.tolist()
+# )
+
 
