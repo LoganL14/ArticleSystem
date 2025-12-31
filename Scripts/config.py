@@ -9,13 +9,14 @@ REQUEST_TIMEOUT: int = 60
 
 # Date / Time
 TZ_NAME: str = "UTC"         
-DAYS_OFFSET: int = 6         
+DAYS_OFFSET: int = 7         
 DATE_FMT_API: str = "%Y%m%d%H%M"  # format arXiv expects in submittedDate rang
 
 # Directories
 DOWNLOAD_ROOT: str = "./downloaded_papers"         
 MARKDOWN_ROOT: str = "./downloaded_papers_md"  
 EMBEDDINGS_ROOT: str = "./downloaded_embeddings"
+SUMMARY_ROOT: str = "./summary_prompts"
     
 # Chunking
 MAX_CHARS: int = 1400

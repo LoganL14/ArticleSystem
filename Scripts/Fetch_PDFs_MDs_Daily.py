@@ -117,7 +117,6 @@ def parse_pdf_to_markdown(resultspdf: Iterable[str], start_utc_time: str) -> lis
         list[str]: Paths to successfully written Markdown files."""
     
     download_folder_md = Path(MARKDOWN_ROOT) / start_utc_time
-    Path(MARKDOWN_ROOT) / start_utc_time
     download_folder_md.mkdir(parents=True, exist_ok=True)
     converter = DocumentConverter()
     downloadedmd = []
