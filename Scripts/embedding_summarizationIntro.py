@@ -15,19 +15,21 @@ from pathlib import Path
 #uses the fetch pdfs and mds scripts functions
 from Fetch_PDFs_MDs_Daily import get_utc_times_for_2daysago, build_search_query
 #function formatting, ->
-from typing import List, Dict
+from typing import List
 #uses config.py to bring in necessary global arguments
 from config import SUMMARY_ROOT, EMBEDDINGS_ROOT
 #used for embedding / vector use
 import numpy as np
+
 import json
+from context import ctx
 
-
-def get_start_utc_time() -> str:
-    """ Recompute the same date window for reference """
-    twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
-    search_query, start_utc_time = build_search_query(twodaysago_midnight_utc, twodaysago_end_utc)  # you can ignore `_query` here
-    return start_utc_time
+#REMOVE CAUSE OF CONTEXT.PY
+# def get_start_utc_time() -> str:
+#     """ Recompute the same date window for reference """
+#     twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
+#     search_query, start_utc_time = build_search_query(twodaysago_midnight_utc, twodaysago_end_utc)  # you can ignore `_query` here
+#     return start_utc_time
 
 
 def get_embed_files(start_utc_time: str) -> List[str]:
@@ -58,7 +60,7 @@ def cosine_similarity(a,b):
 
 
 
-def get_top5_embeddings(embed_file: str):
+def get_top5_embeddings(embed_file: str) -> list[tuple[int,float]]:
     
     embeddings = load_embedding(embed_file)
     centroid = embeddings.mean(axis = 0)
@@ -90,7 +92,7 @@ def make_prompt(article_id: str, top_texts: list[str]) -> str:
 ##########################
 
 
-def save_summary_prompt(prompt: str):
+def save_summary_prompt(prompt: str, article_id: str, start_utc_time: str):
     summary_prompt_folder = Path(SUMMARY_ROOT) / start_utc_time
     summary_prompt_folder.mkdir(parents=True,exist_ok=True)
     base = article_id
@@ -105,28 +107,14 @@ def save_summary_prompt(prompt: str):
 
 if __name__ == "__main__":
 
-    start_utc_time = get_start_utc_time()
-    embed_files = get_embed_files(start_utc_time)
-    meta_files = get_meta_files(start_utc_time)
-    print(meta_files)
+    embed_files = get_embed_files(ctx.start_utc_time)
+    meta_files = get_meta_files(ctx.start_utc_time)
 
     for embed_file in embed_files:
         
         top5 = get_top5_embeddings(embed_file)
-        meta_file = str(Path(embed_file).parent / (Path(embed_file).stem.replace('_vectors', '') + '.jsonl'))  # match file   
+        meta_file = str(Path(embed_file).parent / (Path(embed_file).stem.replace('_vectors', '') + '.jsonl'))
         texts = top_texts(meta_file, top5)
         article_id = Path(embed_file).stem.replace('_vectors', '')
-        
-        # print("article:", article_id)
-        # print("top5 idx:", [i for i, _ in top5])
-        # meta = load_meta_file(meta_file)
-        # print("meta rows:", len(meta))
-        # print("sample keys:", list(meta[0].keys()) if meta else [])
-        # empty_count = sum(1 for idx, _ in top5 if not meta[idx].get("chunk_text", "").strip())
-        # print(f"empty passages in top5: {empty_count}")
-
         prompt = make_prompt(article_id, texts)
-        save_summary_prompt(prompt)
-
-
-    #     ###########
+        save_summary_prompt(prompt, article_id, ctx.start_utc_time)

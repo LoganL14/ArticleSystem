@@ -7,7 +7,7 @@ from pathlib import Path
 #uses the fetch pdfs and mds scripts functions
 from Fetch_PDFs_MDs_Daily import get_utc_times_for_2daysago, build_search_query
 #function formatting, -> 
-from typing import List, Dict
+from typing import List
 #Langchain for chunking and embedding 
 from langchain_text_splitters import MarkdownTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -17,16 +17,19 @@ from config import MAX_CHARS, OVERLAP, MARKDOWN_ROOT, EMBEDDINGS_ROOT, EMB_MODEL
 import numpy as np
 #used for embedding metadata
 import json
+
 #saving the model used for embedding
 emb_model = HuggingFaceEmbeddings(model_name = EMB_MODEL)
 
+from context import ctx
 
-def get_start_utc_time() -> str:
-    """ Recompute the same date window for reference """
+#REMOVE SINCE CONTEXT.PY FILE
+# def get_start_utc_time() -> str:
+#     """ Recompute the same date window for reference """
 
-    twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
-    search_query, start_utc_time = build_search_query(twodaysago_midnight_utc, twodaysago_end_utc) 
-    return start_utc_time
+#     twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
+#     search_query, start_utc_time = build_search_query(twodaysago_midnight_utc, twodaysago_end_utc) 
+#     return start_utc_time
 
 
 def get_md_files(start_utc_time: str) -> List[str]:
@@ -97,9 +100,7 @@ def save_embeddings_and_metadata(chunks: List[str], md_file: str, start_utc_time
 
 if __name__ == "__main__":
     
-    start_utc_time = get_start_utc_time()
-    #print(start_utc_time)
-    md_files = get_md_files(start_utc_time)
+    md_files = get_md_files(ctx.start_utc_time)
     #print(md_files)
 
     #put all the chunks into a dictonary. Where the file name is the key and the chunk is the value 
@@ -113,7 +114,7 @@ if __name__ == "__main__":
         text = load_markdown(md_file)
         chunksMD = chunk_langchain(text, MAX_CHARS, OVERLAP)
         print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
-        save_embeddings_and_metadata(chunksMD, md_file, start_utc_time)
+        save_embeddings_and_metadata(chunksMD, md_file, ctx.start_utc_time)
         
     
 

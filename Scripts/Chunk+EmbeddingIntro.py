@@ -61,7 +61,7 @@ def load_markdown(md_file: str) -> str:
 #     return chunks
 
 
-def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 0) -> list[str]:
+def chunk_langchain(text: str, max_chars: int = 1400, overlap: int = 0) -> list[str]:
     """
     Split text into chunks (USING LANGCHAIN INSTEAD), each up to max_chars characters.
     """
@@ -69,7 +69,6 @@ def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 0) -> list[
         chunk_size = max_chars,
         chunk_overlap = overlap
     )
-    docs = markdown_splitter.create_documents([text])
     chunks = markdown_splitter.split_text(text)
     return chunks
 
@@ -107,8 +106,14 @@ if __name__ == "__main__":
 # ]
     chunksMD = chunk_langchain(raw_text)
     #print(chunksMD)
-    print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
-    all_chunks_md[md_file] = chunksMD
+    #print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
+    
+    for i, chunk in enumerate(chunksMD):
+        print(f"\n\n===== CHUNK {i:03d} START =====")
+        print(chunk)
+        print(f"===== CHUNK {i:03d} END =====")
+
+    #all_chunks_md[md_file] = chunksMD
     #print(all_chunks_md)
 
     # take a list of texts (documents/passages) and returns a list of embeddings (vectors)
@@ -118,5 +123,5 @@ if __name__ == "__main__":
 #     [0.0141, -0.0321, 0.0832, ..., -0.0017]  # embedding for chunk 3
 # ]
 
-    resultchunksemb = emb_model.embed_documents(chunksMD)
-    print(resultchunksemb)
+    # resultchunksemb = emb_model.embed_documents(chunksMD)
+    # print(resultchunksemb)

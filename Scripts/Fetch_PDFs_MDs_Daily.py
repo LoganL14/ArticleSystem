@@ -8,11 +8,9 @@ from config import BASE_URL, MAX_RESULTS, search_term, REQUEST_TIMEOUT, TZ_NAME,
 from requests.exceptions import RequestException
 import requests
 #work with dates, +/-, etc
-from datetime import datetime, timedelta
+from datetime import datetime
 #function formatting, -> 
-from typing import Iterable, Tuple
-#work with specific timezones
-from zoneinfo import ZoneInfo
+from typing import Iterable
 #to pull from xml request, the data I need (PDFs)
 from bs4 import BeautifulSoup
 #Representing file and directory paths
@@ -20,33 +18,35 @@ from pathlib import Path
 #Docling to go from PDFs to md
 from docling.document_converter import DocumentConverter
 
+from context import ctx
 
-def get_utc_times_for_2daysago() -> Tuple[datetime, datetime, str]:
-    """Function to get the  time range from midnight to end of day (UTC). (2 days ago, to ensure all articles are added)
-    Later used as a way to filter for specific articles
-     Returns:
-      tuple: (start_utc, end_utc, day_label)"""
+#CAN NOW REMOVE BECAUSE OF CONTEXT.PY
+# def get_utc_times_for_2daysago() -> Tuple[datetime, datetime, str]:
+#     """Function to get the  time range from midnight to end of day (UTC). (2 days ago, to ensure all articles are added)
+#     Later used as a way to filter for specific articles
+#      Returns:
+#       tuple: (start_utc, end_utc, day_label)"""
     
-    # Specify time zone, subtract "DAYS_OFFSET" days off of current day. Replace with 12:00am and 11:59pm of that day
-    tz = ZoneInfo(TZ_NAME)
-    now_utc = datetime.now(tz) - timedelta(days=DAYS_OFFSET)
-    twodaysago_midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
-    twodaysago_end_utc = now_utc.replace(hour=23, minute=59, second=59, microsecond=0)
+#     # Specify time zone, subtract "DAYS_OFFSET" days off of current day. Replace with 12:00am and 11:59pm of that day
+#     tz = ZoneInfo(TZ_NAME)
+#     now_utc = datetime.now(tz) - timedelta(days=DAYS_OFFSET)
+#     twodaysago_midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+#     twodaysago_end_utc = now_utc.replace(hour=23, minute=59, second=59, microsecond=0)
    
-    # clean way to look at the day you are looking at
-    yday_label = str(twodaysago_midnight_utc.date())
+#     # clean way to look at the day you are looking at
+#     yday_label = str(twodaysago_midnight_utc.date())
 
-    return twodaysago_midnight_utc, twodaysago_end_utc, yday_label
+#     return twodaysago_midnight_utc, twodaysago_end_utc, yday_label
 
 
-def build_search_query(twodaysago_midnight_utc : datetime, twodaysago_end_utc : datetime, search_term = None) -> Tuple[str, str]:
+def build_search_query(start_utc_dt: datetime, end_utc_dt : datetime, search_term = None) -> str:
     """Build a search query with date range and other information (optional).
     Returns:
         str: Formatted search query. In a format the API accepts."""
 
     #format the dates for query. Ex) 202512170000
-    start_utc_time =  twodaysago_midnight_utc.strftime(DATE_FMT_API)
-    end_utc_time  =  twodaysago_end_utc.strftime(DATE_FMT_API)
+    start_utc_time =  start_utc_dt.strftime(DATE_FMT_API)
+    end_utc_time  =  end_utc_dt.strftime(DATE_FMT_API)
     
     #build the date query. Example - submittedDate:[202512170000 TO 202512180000] 
     date_query = f"submittedDate:[{start_utc_time} TO {end_utc_time}]"
@@ -54,10 +54,10 @@ def build_search_query(twodaysago_midnight_utc : datetime, twodaysago_end_utc : 
     # check if search term is added to create full query. Otherwise, just the date query
     if search_term:
         search_query = f"{search_term} AND {date_query}"
-        return search_query, start_utc_time
+        return search_query
     else:
         search_query = date_query
-    return search_query, start_utc_time
+    return search_query
 
 
 def fetch_papers(search_query: str, start_utc_time: str):
@@ -137,18 +137,19 @@ def parse_pdf_to_markdown(resultspdf: Iterable[str], start_utc_time: str) -> lis
 if __name__ == "__main__":
 
     #Get the dates that will be used to query later
-    twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
+    #REMOVE NOW BECAUSE OF CONTEXT.PY
+    #twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
     #print(yesterday_midnight_utc, yesterday_end_utc, yday_label)
 
     #Call the function to build the search query
-    search_query, start_utc_time = build_search_query(twodaysago_midnight_utc, twodaysago_end_utc)
+    search_query = build_search_query(ctx.start_utc_dt, ctx.end_utc_dt)
     #print(search_query, start_utc_time)
 
     #download the resulting pdfs, store the pdfs in a list "resultspdf"
-    resultspdf = fetch_papers(search_query, start_utc_time)
+    resultspdf = fetch_papers(search_query, ctx.start_utc_time)
 
     #download the resulting md files, store in a list "resultsmd"
-    resultsmd = parse_pdf_to_markdown(resultspdf, start_utc_time)
+    resultsmd = parse_pdf_to_markdown(resultspdf, ctx.start_utc_time)
 
 
 
