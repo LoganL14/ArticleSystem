@@ -1,14 +1,6 @@
-# take each .npy file I have (which holds chunks for a specific article)
-#find the "average embedding" mean(all_chunk_embeddings)
-#compute similarity between each chunk embedding and the paper centroid 
-#select top-k chunks 
-#summarize these selected chunks (only feed these into the LLM)
-#have a set prompt to give like ("summarize the key methods and findings from the following excerpts of a research paper")
-
-#loop through and do this for each .npy file I have? leading to short summary for each unique article?
-
-#shouldnt need similiarity search for this method... as even if there are 100 articles a day (50 chunks each), only 5,000 vectors
-
+""" Script to take embeddings for each article, find centroid (mean) embedding for each article. 
+Then find the closest embeddings - embeddings that best represent the articles theme.
+Finally fill a prompt template with each articles "top" embeddings and save the summary prompts that LLM will use. """
 
 #Representing file and directory paths
 from pathlib import Path
@@ -59,6 +51,7 @@ def cosine_similarity(a,b):
     return np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
+
 def get_top5_embeddings(embed_file: str) -> list[tuple[int,float]]:
     
     embeddings = load_embedding(embed_file)
@@ -71,7 +64,6 @@ def get_top5_embeddings(embed_file: str) -> list[tuple[int,float]]:
 
     top5 = sorted(scores, key=lambda x:x[1], reverse= True)[:5]
     return top5
-
 
 def top_texts(meta_file: str, top5: list[tuple[int,float]]) -> list[str]:
     meta = load_meta_file(meta_file)
@@ -93,11 +85,11 @@ def make_prompt(article_id: str, top_texts: list[str]) -> str:
 
 
 def save_summary_prompt(prompt: str, article_id: str, start_utc_time: str):
-    summary_prompt_folder_TEST = Path("./summary_prompts_TEST") / start_utc_time     
-    summary_prompt_folder_TEST.mkdir(parents=True,exist_ok=True)
+    summary_prompt_folder = Path(SUMMARY_ROOT) / start_utc_time    
+    summary_prompt_folder.mkdir(parents=True,exist_ok=True)
     base = article_id
-    prompt_path = summary_prompt_folder_TEST / f"{base}.md"
- 
+    prompt_path = summary_prompt_folder / f"{base}.md"
+    
     try:
         prompt_path.write_text(prompt, encoding="utf-8")
         print(f"Saved Markdown: {prompt_path}")

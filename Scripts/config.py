@@ -1,5 +1,3 @@
-#defines constants and settings used across the project:
-
 # arXiv API & Request Settings
 BASE_URL: str =  "https://export.arxiv.org/api/query"
 MAX_RESULTS: int = 5
@@ -9,7 +7,7 @@ REQUEST_TIMEOUT: int = 60
 
 # Date / Time
 TZ_NAME: str = "UTC"         
-DAYS_OFFSET: int = 7         
+DAYS_OFFSET: int = 9         
 DATE_FMT_API: str = "%Y%m%d%H%M"  # format arXiv expects in submittedDate rang
 
 # Directories
@@ -19,11 +17,19 @@ EMBEDDINGS_ROOT: str = "./downloaded_embeddings"
 SUMMARY_ROOT: str = "./summary_prompts"
     
 # Chunking
-MAX_CHARS: int = 1400
-OVERLAP: int = 0
+MAX_CHARS: int = 2000
+OVERLAP: int = 200
 
 # Embedding 
 # model has max tokens of 216, and fixed vector size of 384 dimensions
 #EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
 # model has max tokens of 512
-EMB_MODEL = "BAAI/bge-small-en-v1.5"
+#EMB_MODEL = "BAAI/bge-base-en-v1.5"
+
+#model with higher max tokens, 8192 tokens. 1024 dimension size
+EMB_MODEL = "BAAI/bge-m3"
+
+
+#LLM Summarization
+MODEL_ID = "unsloth/Llama-3.2-3B-Instruct"

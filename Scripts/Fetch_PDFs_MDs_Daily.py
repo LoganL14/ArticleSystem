@@ -1,7 +1,6 @@
 """ Script to collect pdfs from articles posted 2 days ago. Put them into . /downloaded_papers folder
     Also, take the pdfs and convert them into markdown files. Put them into . /downloaded_papers_md folder"""
 
-
 #uses config.py to bring in necessary global arguments
 from config import BASE_URL, MAX_RESULTS, search_term, REQUEST_TIMEOUT, TZ_NAME, DAYS_OFFSET, DATE_FMT_API, DOWNLOAD_ROOT, MARKDOWN_ROOT
 #lets you extract information from an API
@@ -17,7 +16,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 #Docling to go from PDFs to md
 from docling.document_converter import DocumentConverter
-
+############################
 from context import ctx
 
 #CAN NOW REMOVE BECAUSE OF CONTEXT.PY
@@ -136,53 +135,15 @@ def parse_pdf_to_markdown(resultspdf: Iterable[str], start_utc_time: str) -> lis
 
 if __name__ == "__main__":
 
-    #Get the dates that will be used to query later
     #REMOVE NOW BECAUSE OF CONTEXT.PY
     #twodaysago_midnight_utc, twodaysago_end_utc, yday_label = get_utc_times_for_2daysago()
     #print(yesterday_midnight_utc, yesterday_end_utc, yday_label)
 
     #Call the function to build the search query
     search_query = build_search_query(ctx.start_utc_dt, ctx.end_utc_dt)
-    #print(search_query, start_utc_time)
 
     #download the resulting pdfs, store the pdfs in a list "resultspdf"
     resultspdf = fetch_papers(search_query, ctx.start_utc_time)
 
     #download the resulting md files, store in a list "resultsmd"
     resultsmd = parse_pdf_to_markdown(resultspdf, ctx.start_utc_time)
-
-
-
-#NOTES ON HOW CODE WORKS
-
-## each entry has these (resp.text)
- #   <link href="https://arxiv.org/abs/2512.14974v1" rel="alternate" type="text/html"/>
- #   <link href="https://arxiv.org/pdf/2512.14974v1" rel="related" type="application/pdf" title="pdf"/>
-## Grab only the <link> tags above (  soup = BeautifulSoup(resp.text, 'xml') -> all_entries = soup.find_all('link')  )
-    
-## To get only the actual https.  ( all_href_links = [i['href'] for i in all_entries if i.get('type') == 'application/pdf'] )
-# 'https://arxiv.org/pdf/2512.15091v1'
-
-## Create the destination folder  (./downloaded_papers/<paper_date> (e.g., ./downloaded_papers/2025-12-18).
-#download_folder = Path(f'./downloaded_papers/{paper_date}')    ->   download_folder.mkdir
-
-## Create a local filename for each pdf   ( filename = url.split('/')[-1] + '.pdf' )
-# Example: "https://arxiv.org/pdf/2512.12345v1" → "2512.12345v1.pdf"
-
-
-## Construct the full file path 
-# fp_path = download_folder / filename (Result: ./downloaded_papers/<paper_date>/<filename>.)
-
-
-## Get the content within each url (downladed in chunks)
- #response = requests.get(url, stream=True)
-
-## Opens a file at fp_path in binary write mode ('wb')??
-#with open(fp_path, 'wb')
-
-
-## Understand the rest?
-
-# for chunk in response.iter_content(chunk_size=8192):
-#                     if chunk:
-#                         f.write(chunk)

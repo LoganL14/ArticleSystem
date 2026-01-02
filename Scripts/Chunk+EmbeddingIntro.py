@@ -40,7 +40,9 @@
 from pathlib import Path
 from typing import Iterable, List, Dict
 from langchain_text_splitters import MarkdownTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+import re
 
 def load_markdown(md_file: str) -> str:
     """Read the Markdown file as a single string."""
@@ -61,22 +63,47 @@ def load_markdown(md_file: str) -> str:
 #     return chunks
 
 
-def chunk_langchain(text: str, max_chars: int = 1400, overlap: int = 0) -> list[str]:
-    """
-    Split text into chunks (USING LANGCHAIN INSTEAD), each up to max_chars characters.
-    """
-    markdown_splitter = MarkdownTextSplitter(
-        chunk_size = max_chars,
+# def chunk_langchain(text: str, max_chars: int = 2000, overlap: int = 200) -> list[str]:
+#     """
+#     Split text into chunks (USING LANGCHAIN INSTEAD), each up to max_chars characters.
+#     """
+#     markdown_splitter = MarkdownTextSplitter(
+#         chunk_size = max_chars,
+#         chunk_overlap = overlap
+#     )
+#     chunks = markdown_splitter.split_text(text)
+#     return chunks
+
+def clean_markdown_from_pdf(text: str) -> str: 
+    """Fix common PDF→Markdown conversion artifacts.""" 
+    
+    # Fix page breaks: comma/period + newlines + lowercase = merge 
+    text = re.sub(r'([.,:;])\n\n+([a-z])', r'\1 \2', text) 
+    # Fix hyphenated words split across lines 
+    text = re.sub(r'(\w+)-\n+(\w+)', r'\1\2', text) 
+    # Remove extra blank lines (more than 2 in a row) 
+    text = re.sub(r'\n\n\n+', r'\n\n', text) 
+    
+    return text
+
+def chunk_langchain_recursive(text: str, max_chars: int = 2000, overlap: int = 0) -> list[str]:
+
+    text = clean_markdown_from_pdf(raw_text)
+
+    splitter = RecursiveCharacterTextSplitter(
+        separators=[ "\n##", "\n###", "\n\n", "\n", " "],
+        chunk_size =max_chars,
         chunk_overlap = overlap
     )
-    chunks = markdown_splitter.split_text(text)
+
+    chunks = splitter.split_text(text)
     return chunks
 
 
 #NOW CREATE EMBEDDINGS 
 # try MiniLM-L6-v2
 
-emb_model = HuggingFaceBgeEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2" )
+emb_model = HuggingFaceBgeEmbeddings(model_name = "BAAI/bge-m3" )
 #result = emb_model.embed_query("This is a test application")
 #print(result)
 
@@ -87,7 +114,8 @@ if __name__ == "__main__":
     all_chunks: Dict[str, List[str]] = {}
     all_chunks_md: Dict[str, List[str]] = {}
     
-    md_file = 'downloaded_papers_md\\202512200000\\2512.18524v1.md'
+   #md_file = 'downloaded_papers_md\\202512240000\\2512.21181v1.md'
+    md_file=  'downloaded_papers_md\\202512240000\\2512.21065v1.md'
     raw_text = load_markdown(md_file)
     
 
@@ -104,14 +132,17 @@ if __name__ == "__main__":
 #     "Chunk 2 text here...",
 #     "Chunk 3 text here..."
 # ]
-    chunksMD = chunk_langchain(raw_text)
+
+    #chunksMD = chunk_langchain(raw_text)
+    chunksMD = chunk_langchain_recursive(raw_text)
+    chunks_to_show = chunksMD[:50]
     #print(chunksMD)
     #print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
     
-    for i, chunk in enumerate(chunksMD):
-        print(f"\n\n===== CHUNK {i:03d} START =====")
-        print(chunk)
-        print(f"===== CHUNK {i:03d} END =====")
+    # for i, chunk in enumerate(chunks_to_show):
+    #     print(f"\n\n===== CHUNK {i:03d} START =====")
+    #     print(chunk)
+    #     print(f"===== CHUNK {i:03d} END =====")
 
     #all_chunks_md[md_file] = chunksMD
     #print(all_chunks_md)
@@ -123,5 +154,5 @@ if __name__ == "__main__":
 #     [0.0141, -0.0321, 0.0832, ..., -0.0017]  # embedding for chunk 3
 # ]
 
-    # resultchunksemb = emb_model.embed_documents(chunksMD)
-    # print(resultchunksemb)
+    resultchunksemb = emb_model.embed_documents(chunksMD)
+    print(resultchunksemb)

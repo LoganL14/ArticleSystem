@@ -25,11 +25,6 @@
 #     #print(r)
 
 
-
-
-
-
-
 #first learn how to use api
 #-gives atom xml response?
 # <feed>: The root element for the entire response.
@@ -72,8 +67,6 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from pathlib import Path
 base_url = "http://export.arxiv.org/api/query"
-
-
 
 
 tz = ZoneInfo("UTC")
@@ -141,24 +134,43 @@ def allarticles():
       except requests.exceptions.RequestException as e:
         print(f"An error occurred during download: {e}")
 
+allarticles()
 
- 
-# fp_path.write_bytes(response.content)
-#         print(f"[DOWNLOADED] {file_name} -> {fp_path}")
-#       except requests.exceptions.RequestException as e:
-#         print(f"An error occurred during download: {e}")
-  
 
-#             with open(fp_path, 'wb') as f:    #opens the file path , and says 'wb' - write binary. , do as "f"
-#                 for chunk in response.iter_content(chunk_size=8192):
+
+
+#NOTES ON HOW CODE WORKS
+
+## each entry has these (resp.text)
+ #   <link href="https://arxiv.org/abs/2512.14974v1" rel="alternate" type="text/html"/>
+ #   <link href="https://arxiv.org/pdf/2512.14974v1" rel="related" type="application/pdf" title="pdf"/>
+## Grab only the <link> tags above (  soup = BeautifulSoup(resp.text, 'xml') -> all_entries = soup.find_all('link')  )
+    
+## To get only the actual https.  ( all_href_links = [i['href'] for i in all_entries if i.get('type') == 'application/pdf'] )
+# 'https://arxiv.org/pdf/2512.15091v1'
+
+## Create the destination folder  (./downloaded_papers/<paper_date> (e.g., ./downloaded_papers/2025-12-18).
+#download_folder = Path(f'./downloaded_papers/{paper_date}')    ->   download_folder.mkdir
+
+## Create a local filename for each pdf   ( filename = url.split('/')[-1] + '.pdf' )
+# Example: "https://arxiv.org/pdf/2512.12345v1" → "2512.12345v1.pdf"
+
+
+## Construct the full file path 
+# fp_path = download_folder / filename (Result: ./downloaded_papers/<paper_date>/<filename>.)
+
+
+## Get the content within each url (downladed in chunks)
+ #response = requests.get(url, stream=True)
+
+## Opens a file at fp_path in binary write mode ('wb')??
+#with open(fp_path, 'wb')
+
+
+## Understand the rest?
+
+# for chunk in response.iter_content(chunk_size=8192):
 #                     if chunk:
 #                         f.write(chunk)
-#             print(f"Successfully downloaded: {filename}")
-#             resultspdf.append(str(fp_path))
-#         except requests.exceptions.RequestException as e:
-#             print(f"An error occurred during download: {e}")
-
-
-allarticles()
 
 

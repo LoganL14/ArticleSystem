@@ -1,5 +1,3 @@
-
-
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -23,14 +21,12 @@ def _compute() -> RunContext:
         start_utc_time=start_dt.strftime(DATE_FMT_API),
         day_label=str(start_dt.date()),
     )
-# Compute ON IMPORT
+
+#this line runs the function _compute(), and stores result in ctx. Use in other scripts from context import ctx
 ctx: RunContext = _compute()
-#this line runs the function _compute(), and stores result in ctx
-#use in other scripts from context import ctx
+
 
 #any script can now use these directly:
-
-# Use these directly:
 # ctx.start_utc_dt
 # ctx.end_utc_dt
 # ctx.start_utc_time

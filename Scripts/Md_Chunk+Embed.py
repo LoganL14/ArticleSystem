@@ -5,23 +5,27 @@
 #Representing file and directory paths
 from pathlib import Path
 #uses the fetch pdfs and mds scripts functions
-from Fetch_PDFs_MDs_Daily import get_utc_times_for_2daysago, build_search_query
+from Fetch_PDFs_MDs_Daily import build_search_query
 #function formatting, -> 
 from typing import List
 #Langchain for chunking and embedding 
 from langchain_text_splitters import MarkdownTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 #uses config.py to bring in necessary global arguments
 from config import MAX_CHARS, OVERLAP, MARKDOWN_ROOT, EMBEDDINGS_ROOT, EMB_MODEL
 #used for embedding / vector use
 import numpy as np
 #used for embedding metadata
 import json
-
+###################
+import re
+#################
+from context import ctx
 #saving the model used for embedding
 emb_model = HuggingFaceEmbeddings(model_name = EMB_MODEL)
 
-from context import ctx
+
 
 #REMOVE SINCE CONTEXT.PY FILE
 # def get_start_utc_time() -> str:
@@ -49,17 +53,32 @@ def load_markdown(md_file: str) -> str:
     return Path(md_file).read_text(encoding="utf-8")
 
 
-def chunk_langchain(text: str, MAX_CHARS, OVERLAP) -> List[str]:
-    """ Used to create chunks. Set parameters like max_chars and overlapping chunks.
-     Returns:
-        Split text into chunks (USING LANGCHAIN), each up to max_chars characters."""
+def clean_markdown_from_pdf(text: str) -> str: 
+    """Fix common PDF→Markdown conversion artifacts.""" 
     
-    markdown_splitter = MarkdownTextSplitter(
-        chunk_size = MAX_CHARS,
-        chunk_overlap = OVERLAP
+    # Fix page breaks: comma/period + newlines + lowercase = merge 
+    text = re.sub(r'([.,:;])\n\n+([a-z])', r'\1 \2', text) 
+    # Fix hyphenated words split across lines 
+    text = re.sub(r'(\w+)-\n+(\w+)', r'\1\2', text) 
+    # Remove extra blank lines (more than 2 in a row) 
+    text = re.sub(r'\n\n\n+', r'\n\n', text) 
+    
+    return text
+
+
+def chunk_langchain_recursive(raw_text: str, max_chars: int = 2000, overlap: int = 0) -> list[str]:
+
+    text = clean_markdown_from_pdf(raw_text)
+
+    splitter = RecursiveCharacterTextSplitter(
+        separators=[ "\n##", "\n###", "\n\n", "\n", " "],
+        chunk_size =max_chars,
+        chunk_overlap = overlap
     )
-    chunks = markdown_splitter.split_text(text)
+
+    chunks = splitter.split_text(text)
     return chunks
+
 
 
 def save_embeddings_and_metadata(chunks: List[str], md_file: str, start_utc_time: str) -> None:
@@ -101,18 +120,11 @@ def save_embeddings_and_metadata(chunks: List[str], md_file: str, start_utc_time
 if __name__ == "__main__":
     
     md_files = get_md_files(ctx.start_utc_time)
-    #print(md_files)
-
-    #put all the chunks into a dictonary. Where the file name is the key and the chunk is the value 
-    #all_chunks: Dict[str, List[str]] = {}  # md_path -> list of chunks
-    #all_embeddings: Dict[str, List[List[float]]] = {}
-    #all_chunks[md_file] = chunksMD
-    #all_embeddings[md_file] = doc_embs
 
     #for each md file. You will see "Total Chunks: X", npy file saved and its shape, .jsonl file saved and rows 
     for md_file in md_files:
-        text = load_markdown(md_file)
-        chunksMD = chunk_langchain(text, MAX_CHARS, OVERLAP)
+        raw_text = load_markdown(md_file)
+        chunksMD = chunk_langchain_recursive(raw_text, MAX_CHARS, OVERLAP)
         print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
         save_embeddings_and_metadata(chunksMD, md_file, ctx.start_utc_time)
         
