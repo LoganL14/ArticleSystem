@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["requests","beautifulsoup4","arxiv", "tzdata", "lxml", "docling","langchain",
 "langchain-text-splitters",  "langchain-community","langchain-huggingface", "tiktoken",  "sentence-transformers",
-"transformers",   "huggingface-hub", "chromadb" , "faiss-cpu"]
+"transformers",   "huggingface-hub", "chromadb" , "faiss-cpu",]
 
 # standard library imports: datetime, typing, zoneinfo, pathlib
 

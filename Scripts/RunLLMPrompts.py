@@ -48,19 +48,39 @@ if __name__ == "__main__":
     #actually loads the model (neural net). This AutoModelForCausalLM is specifically for text generation
     model = AutoModelForCausalLM.from_pretrained(MODEL_ID)
 
-    prompt_files = get_prompt_files(ctx.start_utc_time)
+    #prompt_files = get_prompt_files(ctx.start_utc_time)
+    #print(prompt_files)
 
-    for prompt_file in prompt_files:
+    # for prompt_file in prompt_files:
         
-        prompt_text = load_prompt_file(prompt_file)
+    #     prompt_text = load_prompt_file(prompt_file)
         
-        #runs the tokenizer on my input, meaning each "prompt_text".  Encodes the prompt string into PyTorch tensors, moves to same device
-        inputs = tokenizer(prompt_text, return_tensors="pt").to(model.device)
+    #     #runs the tokenizer on my input, meaning each "prompt_text".  Encodes the prompt string into PyTorch tensors, moves to same device
+    #     inputs = tokenizer(prompt_text, return_tensors="pt").to(model.device)
         
-        #runs the model, use the input, producing new token IDs
-        output = model.generate(**inputs, max_new_tokens=600)
+    #     #runs the model, use the input, producing new token IDs
+    #     output = model.generate(**inputs, max_new_tokens=600)
        
-        #turns the output, tokenIDs, into actual text
-        summary = tokenizer.decode(output[0], skip_special_tokens=True)
+    #     #turns the output, tokenIDs, into actual text
+    #     summary = tokenizer.decode(output[0], skip_special_tokens=True)
 
-        print(f"\nSummary for {prompt_file}:\n{summary}\n")
+    #     print(f"\nSummary for {prompt_file}:\n{summary}\n")
+
+    
+    import time
+
+
+    prompt_file = "summary_prompts\\202512240000\\2512.21058v1.md"
+    prompt_text = load_prompt_file(prompt_file)
+    #runs the tokenizer on my input, meaning each "prompt_text".  Encodes the prompt string into PyTorch tensors, moves to same device
+    inputs = tokenizer(prompt_text, return_tensors="pt").to(model.device)
+
+    #runs the model, use the input, producing new token IDs
+    t0 = time.time()
+    output = model.generate(**inputs, max_new_tokens=200)
+       
+    #turns the output, tokenIDs, into actual text
+    summary = tokenizer.decode(output[0], skip_special_tokens=True)
+    print("Generate seconds:", round(time.time() - t0, 2))
+
+    print(f"\nSummary for {prompt_file}:\n{summary}\n")

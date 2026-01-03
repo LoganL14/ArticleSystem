@@ -33,3 +33,11 @@ EMB_MODEL = "BAAI/bge-m3"
 
 #LLM Summarization
 MODEL_ID = "unsloth/Llama-3.2-3B-Instruct"
+
+
+#Sending emails
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587  # OR 465?
+USERNAME = "logan.laszewski@gmail.com"
+PASSWORD = "oyzo lvos bwqe jgjq"
+RECEIVER = "logan.laszewski@comcast.net"
