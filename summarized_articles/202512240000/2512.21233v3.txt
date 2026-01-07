@@ -1,11 +1,2 @@
-I'm happy to help you with summarizing the article. However, I need to clarify that I'm a large language model, I don't have the capability to directly access or download PDF files. The link provided is likely a DOI (Digital Object Identifier) for the article.
-
-That being said, I can provide a summary of the article based on the text provided in the passage. Here's a summary:
-
-The article proposes a method called UniTacHand, which aims to unify tactile-pose representations between human hands and dexterous robotic hands. The authors introduce a two-stage process to achieve this goal.
-
-First, they project heterogeneous tactile data from both human and robotic domains onto a unified 2D UV map of the MANO hand model. This step unifies the data structure and embeds spatial context, making it possible for policies to learn from a mixture of both human and robotics data.
-
-Second, they leverage a small, paired dataset to train encoders using a contrastive learning framework. The goal is to align the representations from both domains into a shared, domain-invariant latent space.
-
-The authors compare their approach against several baselines, including simple patch-wise mapping, direct transfer via UV Map, and UniTacHand (their proposed method
+The article is available at: https://arxiv.org/pdf/2512.21233v3
+The paper proposes a method called UniTacHand to bridge the gap between human hands and robotic dexterous hands by learning a unified tactile-pose representation. This is achieved through a two-stage process, where heterogeneous tactile data from both human and robotic domains is first projected onto a 2D UV map, and then aligned into a shared latent space using contrastive learning. The resulting representation enables zero-shot or one-shot policy transfer for tactile-based manipulation tasks, allowing for the utilization of large-scale human tactile data. The approach is compared to other baselines, demonstrating its effectiveness in unifying tactile representations and enabling policy transfer. By leveraging spatial context and aligning it to an explicit morphological space, UniTacHand presents a data-efficient alternative for learning unified representations.

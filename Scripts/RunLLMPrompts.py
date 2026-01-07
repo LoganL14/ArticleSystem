@@ -7,7 +7,7 @@ from Fetch_PDFs_MDs_Daily import build_search_query
 #function formatting, ->
 from typing import List
 #uses config.py to bring in necessary global arguments
-from config import SUMMARIES_ROOT, SUMMARY_PROMPTS_ROOT, MODEL_ID, TEMPERATURE, MAX_NEW_TOKENS, API_KEY
+from config import SUMMARIES_ROOT, SUMMARY_PROMPTS_ROOT, MODEL_ID, TEMPERATURE, MAX_NEW_TOKENS, GROQ_API_KEY
 from context import ctx
 import ollama
 from groq import Groq
@@ -27,7 +27,7 @@ def load_prompt_file(prompt_file: str):
 
 if __name__ == "__main__":
 
-    client = Groq(api_key = API_KEY)
+    client = Groq(api_key = GROQ_API_KEY)
 
     prompt_files = get_prompt_files(ctx.start_utc_time)
 

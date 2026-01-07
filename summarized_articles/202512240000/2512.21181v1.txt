@@ -1,11 +1,2 @@
 The article is available at: https://arxiv.org/pdf/2512.21181v1
-
-Summary:
-
-The Fixed-Parameter-Count Quantum Approximate Optimization Algorithm (FPC-QAOA) is a scalable framework for variational quantum algorithms that addresses the exponential growth of parameter space with circuit depth. FPC-QAOA separates schedule optimization from circuit digitization, enabling arbitrarily deep digitized adiabatic evolutions without increasing the number of trainable parameters or classical optimization complexity.
-
-The algorithm preserves the core structure of QAOA while recasting the ansatz as a digitized adiabatic evolution governed by three smooth schedule functions associated with the initial, problem, and auxiliary Hamiltonians. This fixed-size parameterization enables deeper digitalization without expanding the classical search space, mitigating overparameterization and optimization challenges.
-
-FPC-QAOA was benchmarked on random MaxCut instances and the Tail Assignment Problem, achieving performance comparable to or better than standard QAOA with nearly constant classical effort and significantly fewer quantum circuit evaluations. Experiments on the IBM Kingston superconducting processor with up to 50 qubits confirmed robustness and hardware efficiency under realistic noise.
-
-The framework of FPC-QAOA is described as a generalized time-dependent
+This research introduces the Fixed-Parameter-Count Quantum Approximate Optimization Algorithm, a scalable framework designed to address key limitations in variational quantum algorithms. By separating schedule optimization from circuit digitization, the algorithm enables deep digitized adiabatic evolutions without increasing the number of trainable parameters. This approach mitigates issues such as overparameterization and barren-plateau-like behaviors, leading to more stable convergence and reduced classical overhead. The algorithm has been benchmarked on various problems, including random MaxCut instances, demonstrating improved solution quality and reduced optimization effort compared to standard Quantum Approximate Optimization Algorithm approaches. The results position this new paradigm as a practical and hardware-efficient solution for scalable quantum optimization on near-term quantum devices.

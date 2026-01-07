@@ -1,10 +1,10 @@
 
 from groq import Groq
 import os
-from config import API_KEY
+from config import GROQ_API_KEY
 
 
-print(API_KEY)
+print(GROQ_API_KEY)
 
 # def check_groq_auth():
 #     # Prefer environment variable; strip whitespace

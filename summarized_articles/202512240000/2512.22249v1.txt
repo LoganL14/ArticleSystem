@@ -1,9 +1,2 @@
-The article discusses a novel approach to human motion segmentation using Temporal Variational Semantics (TVS). The authors propose a framework that incorporates TVS to efficiently determine the Human Motion Segmentation (HMS) with limited iterations.
-
-The key contributions of the paper are:
-
-1. **Proposition 1**: The optimal solution to problem (2) will align with the true segmentation, assuming frames are distributed across distinct subspaces.
-2. **Theorem 3**: The expected segmentation error satisfies E[Err HMS] ≤ C1pLmin + C2σ2∆2sub, where p is the probability of LLM adjacency errors, Lmin is the minimum segment length, σ2 is the within-segment variance, and ∆2sub is the between-subspace separation.
-3. **Theorem 2**: The proposed framework is robust to occasional LLM misjudgments, as the TVS-induced regularizer preserves overall temporal coherence by enforcing smooth embeddings within segments.
-
-The authors propose a feedback-enabled subspace embedding approach that incorporates TVS to efficiently determine HMS with limited iterations. They introduce a clustering regularizer based on the subspace embedding Z and the indicator matrix Q, which promotes effective grouping while adhering to the constraint
+The article is available at: https://arxiv.org/pdf/2512.22249v1
+The proposed framework aims to achieve accurate human motion segmentation by incorporating temporal semantics into the segmentation process. The method utilizes a large language model to identify temporal neighborhoods of each frame, promoting semantic consistency within segments. The approach balances data fidelity, subspace embedding, and temporal smoothness through a joint optimization framework. This enables the model to refine its learned embeddings and achieve improved motion segmentation performance. Theoretical analysis demonstrates the framework's robustness to annotation noise and its ability to maintain temporal coherence. The method's effectiveness is further highlighted through visualizations of embedded features and similarity matrices, showcasing its ability to produce compact clusters and accurate motion segments. Overall, the framework provides a robust and efficient approach to human motion segmentation, leveraging the strengths of both temporal semantics and subspace embedding.

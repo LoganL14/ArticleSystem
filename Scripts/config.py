@@ -37,10 +37,10 @@ EMB_MODEL = "BAAI/bge-m3"
  
  
 #LLM Summarization
-MODEL_ID = "mixtral-8x7b-32768"
+MODEL_ID = "llama-3.3-70b-versatile"
 TEMPERATURE = 0
 MAX_NEW_TOKENS = 250
-API_KEY = os.getenv("API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
  
  
 #Sending emails

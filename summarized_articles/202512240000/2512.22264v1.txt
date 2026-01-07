@@ -1,11 +1,2 @@
 The article is available at: https://arxiv.org/pdf/2512.22264v1
-
-Summary:
-
-The article presents a new method to accelerate the training of Photonic Neural Networks (PNNs) called the Slicing Method, which is implemented in the LuxIA framework. The Slicing Method reduces memory usage and execution time by efficiently computing transfer matrices for PNNs. This allows for scalable simulation and training of large PNNs.
-
-The article highlights the limitations of current PNN simulation tools, particularly regarding scalability and memory efficiency. It also discusses the challenges of training PNNs, including the need to reconstruct the full mesh transfer matrix M from its constituent layer matrices L i during each backward pass.
-
-The LuxIA framework is introduced as a unified simulation and training framework that supports diverse architectures and datasets. The article presents experimental evaluations across various photonic architectures and standard datasets, demonstrating the effectiveness of LuxIA in surpassing existing tools in speed and scalability.
-
-The article also discusses the importance of end-to-end training for PNNs, which requires advanced tools to efficiently model the photonic circuits involved in their construction. It highlights the limitations of current simulation frameworks and introduces specialized tools such as Photontorch, Neurophox, and Neuro
+Photonic Neural Networks have shown promise in accelerating machine learning, but current simulation tools face challenges in scalability due to computational demands. To address this, a new method called the Slicing Method has been introduced, which enables more efficient transfer matrix computation. This method has been integrated into a framework called LuxIA, allowing for scalable simulation and training of large Photonic Neural Networks. LuxIA has been evaluated across various architectures and datasets, demonstrating its superiority in speed and scalability compared to existing tools. The Slicing Method reduces memory usage and execution time, making it feasible to explore and optimize larger, more complex architectures. This advancement paves the way for broader adoption of photonic computing in machine learning, enabling more efficient and scalable research and development in the field.
