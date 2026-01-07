@@ -11,7 +11,7 @@ REQUEST_TIMEOUT: int = 60
  
 # Date / Time
 TZ_NAME: str = "UTC"         
-DAYS_OFFSET: int = 14        
+DAYS_OFFSET: int = 15        
 DATE_FMT_API: str = "%Y%m%d%H%M"  # format arXiv expects in submittedDate rang
  
 # Directories
@@ -25,16 +25,13 @@ SUMMARIES_ROOT: str = "./summarized_articles"
 MAX_CHARS: int = 2000
 OVERLAP: int = 200
  
+
 # Embedding 
-# model has max tokens of 216, and fixed vector size of 384 dimensions
-#EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
- 
-# model has max tokens of 512
-#EMB_MODEL = "BAAI/bge-base-en-v1.5"
- 
 #model with higher max tokens, 8192 tokens. 1024 dimension size
-EMB_MODEL = "BAAI/bge-m3"
- 
+#EMB_MODEL_HUG = "BAAI/bge-m3"
+EMB_MODEL_HUG = "google/embeddinggemma-300m"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+EMB_MODEL = "gemini-embedding-001"
  
 #LLM Summarization
 MODEL_ID = "llama-3.3-70b-versatile"

@@ -103,7 +103,7 @@ def chunk_langchain_recursive(text: str, max_chars: int = 2000, overlap: int = 0
 #NOW CREATE EMBEDDINGS 
 # try MiniLM-L6-v2
 
-emb_model = HuggingFaceBgeEmbeddings(model_name = "BAAI/bge-m3" )
+#emb_model = HuggingFaceBgeEmbeddings(model_name = "BAAI/bge-m3" )
 #result = emb_model.embed_query("This is a test application")
 #print(result)
 
@@ -135,7 +135,8 @@ if __name__ == "__main__":
 
     #chunksMD = chunk_langchain(raw_text)
     chunksMD = chunk_langchain_recursive(raw_text)
-    chunks_to_show = chunksMD[:50]
+    len(chunksMD)
+    #chunks_to_show = chunksMD[:50]
     #print(chunksMD)
     #print(f"[LangChain Split] Total chunks: {len(chunksMD)}")
     
@@ -154,5 +155,50 @@ if __name__ == "__main__":
 #     [0.0141, -0.0321, 0.0832, ..., -0.0017]  # embedding for chunk 3
 # ]
 
-    resultchunksemb = emb_model.embed_documents(chunksMD)
-    print(resultchunksemb)
+    #resultchunksemb = emb_model.embed_documents(chunksMD)
+    #print(resultchunksemb)
+
+
+
+    """ Script to get all of the markdown files put into . /downloaded_papers_md folder (todays search)
+        Chunk the md files using langchain. Then use embedding model (sentence-transformers/all-MiniLM-L6-v2).
+        Putting resulting vectors into a . /downloaded_embeddings folder (npy files)"""
+
+    #Representing file and directory paths
+    from pathlib import Path
+    #uses the fetch pdfs and mds scripts functions
+    from Fetch_PDFs_MDs_Daily import build_search_query
+    #function formatting, -> 
+    from typing import List
+    #Langchain for chunking and embedding 
+    from langchain_text_splitters import MarkdownTextSplitter
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+    #uses config.py to bring in necessary global arguments
+    from config import MAX_CHARS, OVERLAP, MARKDOWN_ROOT, EMBEDDINGS_ROOT, EMB_MODEL, GEMINI_API_KEY, EMB_MODEL_HUG
+    #used for embedding / vector use
+    import numpy as np
+    #used for embedding metadata
+    import json
+    import re
+    from context import ctx
+
+    from google import genai
+
+#saving the model used for embedding
+    # emb_modelhug = HuggingFaceEmbeddings(model_name = EMB_MODEL_HUG)
+
+    # #embedding model
+    # doc_embs = emb_modelhug.embed_documents(chunksMD)
+    # #print(doc_embs[0:2])
+    # emb_matrix = np.array(doc_embs, dtype=np.float32)
+
+    # client = genai.Client(api_key = GEMINI_API_KEY)
+
+    
+    # embeddings = client.models.embed_content(
+    #     model=EMB_MODEL,  
+    #     contents=chunksMD
+    #     )
+
+    # print(embeddings[0:2])

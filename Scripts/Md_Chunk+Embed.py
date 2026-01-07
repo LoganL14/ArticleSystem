@@ -13,15 +13,18 @@ from langchain_text_splitters import MarkdownTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 #uses config.py to bring in necessary global arguments
-from config import MAX_CHARS, OVERLAP, MARKDOWN_ROOT, EMBEDDINGS_ROOT, EMB_MODEL
+from config import MAX_CHARS, OVERLAP, MARKDOWN_ROOT, EMBEDDINGS_ROOT, EMB_MODEL, GEMINI_API_KEY, EMB_MODEL_HUG
 #used for embedding / vector use
 import numpy as np
 #used for embedding metadata
 import json
 import re
 from context import ctx
+
+import google.generativeai as genai
+
 #saving the model used for embedding
-emb_model = HuggingFaceEmbeddings(model_name = EMB_MODEL)
+emb_modelhug = HuggingFaceEmbeddings(model_name = EMB_MODEL_HUG)
 
 #REMOVE SINCE CONTEXT.PY FILE
 # def get_start_utc_time() -> str:
@@ -87,11 +90,13 @@ def save_embeddings_and_metadata(chunks: List[str], md_file: str, start_utc_time
     out_dir.mkdir(parents=True, exist_ok=True)
 
     #embedding model
-    doc_embs = emb_model.embed_documents(chunks)
+    doc_embs = emb_modelhug.embed_documents(chunks)
+    print(doc_embs[0:2])
     emb_matrix = np.array(doc_embs, dtype=np.float32)
 
+
     #create paths
-    base = Path(md_file).stem  # e.g., '2512.21078v1'
+    base = Path(md_file).stem  # ex '2512.21078v1'
     vec_path = out_dir / f"{base}_vectors.npy"
     meta_path = out_dir /f"{base}.jsonl"
     
@@ -99,7 +104,7 @@ def save_embeddings_and_metadata(chunks: List[str], md_file: str, start_utc_time
     np.save(vec_path, emb_matrix)
     print(f"[SAVE] Vectors: {vec_path} (shape={emb_matrix.shape})")
 
-    #save metadata to path (confusing part?)
+    #save metadata to path
     with meta_path.open("w", encoding = "utf-8") as f:
         for i, chunk_text in enumerate(chunks):
             row = {
