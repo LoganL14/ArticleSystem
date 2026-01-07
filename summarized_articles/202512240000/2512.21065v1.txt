@@ -1,3 +1,3 @@
-Article Summary for 2512.21065v1
+The article is available at: https://arxiv.org/pdf/2512.21065v1
 
-(placeholder summary text)
+This work proposes an end-to-end language-guided grasp detection framework called LGGD, which integrates visual perception and natural language instructions to accurately localize and grasp objects in cluttered environments. The proposed framework leverages a coarse-to-fine learning paradigm, where linguistic cues are progressively injected into the visual feature reconstruction process, enabling fine-grained visual-semantic alignment. Experimental evaluations on the OCID-VLG and Grasp-Anything++ datasets demonstrate that LGGD significantly outperforms previous language-guided grasping baselines in both segmentation accuracy and grasp success metrics. Real-robot experiments further confirm its practical effectiveness, showing that the model can reliably interpret human instructions and generate feasible grasp poses even in visually complex scenarios. The proposed framework represents a step toward more semantically grounded, instruction-aware robotic systems that can flexibly collaborate with humans in real-world environments.

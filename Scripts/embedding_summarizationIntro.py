@@ -17,7 +17,7 @@ from Fetch_PDFs_MDs_Daily import build_search_query
 #function formatting, ->
 from typing import List
 #uses config.py to bring in necessary global arguments
-from config import SUMMARY_ROOT, EMBEDDINGS_ROOT
+from config import SUMMARY_PROMPTS_ROOT, EMBEDDINGS_ROOT
 #used for embedding / vector use
 import numpy as np
 
@@ -75,10 +75,13 @@ def get_top5_embeddings(embed_file: str) -> list[tuple[int,float]]:
 
 def top_texts(meta_file: str, top5: list[tuple[int,float]]) -> list[str]:
     meta = load_meta_file(meta_file)
-    texts = []
-    for idx, _ in top5:
-        texts.append(meta[idx].get("chunk_text", ""))
-    return texts
+    print(f"Loaded metadata for {len(meta)} chunks from {meta_file}")
+    print(meta)
+    # texts = []
+    # for idx, _ in top5:
+    #     texts.append(meta[idx].get("chunk_text", ""))
+    #     print
+    # return texts
 
     ###################
 
@@ -115,6 +118,7 @@ if __name__ == "__main__":
         top5 = get_top5_embeddings(embed_file)
         meta_file = str(Path(embed_file).parent / (Path(embed_file).stem.replace('_vectors', '') + '.jsonl'))
         texts = top_texts(meta_file, top5)
-        article_id = Path(embed_file).stem.replace('_vectors', '')
-        prompt = make_prompt(article_id, texts)
-        save_summary_prompt(prompt, article_id, ctx.start_utc_time)
+        print(texts)
+        # article_id = Path(embed_file).stem.replace('_vectors', '')
+        # prompt = make_prompt(article_id, texts)
+        # save_summary_prompt(prompt, article_id, ctx.start_utc_time)

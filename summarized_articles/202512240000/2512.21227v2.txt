@@ -1,0 +1,13 @@
+The article "Systematic Evaluation of Dynamical Stability in Crystal Generation Models" (https://arxiv.org/pdf/2512.21227v2) presents a systematic evaluation of dynamical stability in crystal generation models. The authors used eight generative models to generate 221,000 novel structures and performed full phonon-spectrum calculations on 108,843 successfully relaxed crystals.
+
+The key results are:
+
+* The overall stability ratio is 25.83%, with 28,119 structures found to be dynamically stable.
+* The top three models are MatterGen (41.0%), InvDesFlow-AL (38.4%), and CrystalFormer (34.4%).
+* Models trained on larger datasets exhibit higher performance, while those trained on smaller datasets show lower stability ratios.
+* Pre-training on large-scale, high-quality crystal databases can substantially enhance the performance of generative models in predicting crystal dynamical stability.
+
+The authors also analyzed the dynamical stability of space-group-constrained crystal generation using CrystalFormer and found that:
+
+* The generated crystals exhibit a distribution across the seven crystal systems that is highly consistent with the Materials Project dataset.
+* Ternary and quaternary compounds account for more than half of the generated materials, in agreement with

@@ -12,7 +12,6 @@ from pathlib import Path
 
 def get_summary_files(start_utc_time: str) -> list[str]:
     """ Get the summary file paths from SUMMARIES_ROOT """
-    # Implementation to load prompts goes here
     summary_folder = Path(SUMMARIES_ROOT) / ctx.start_utc_time
     return [str(p) for p in summary_folder.glob("*")]
 
@@ -23,17 +22,15 @@ def load_summaries(summary_file: str):
 
 
 def build_daily_body(summary_files: list[str]) -> str:
-    """
-    Concatenate all summaries into a single plain-text body.
-    Adds a header and per-file separators for readability.
-    """
-
+    """ Concatenate all summaries into a single plain-text body.
+    Adds a header and per-file separators for readability."""
     body = []
     for summary_file in summary_files:
         summary_text = load_summaries(summary_file).strip()
         body.append(f"--- Summary for {Path(summary_file).name} ---")
         body.append(summary_text)
     return "\n\n".join(body)
+
 
 if __name__ == "__main__":
     

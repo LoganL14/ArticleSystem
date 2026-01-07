@@ -107,7 +107,8 @@ def save_embeddings_and_metadata(chunks: List[str], md_file: str, start_utc_time
                 "md_path": md_file,
                 "chunk_id": f"{base}-{i:04d}",
                 "chunk_index": i,
-                "chunk_text": chunk_text
+                "chunk_text": chunk_text,
+                "paper_url": f"https://arxiv.org/pdf/{base}"
             }
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
     print(f"[SAVE] Metadata: {meta_path} rows={len(chunks)}")

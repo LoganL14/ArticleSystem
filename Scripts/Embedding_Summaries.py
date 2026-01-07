@@ -69,11 +69,22 @@ def top_texts(meta_file: str, top5: list[tuple[int,float]]) -> list[str]:
     texts = []
     for idx, _ in top5:
         texts.append(meta[idx].get("chunk_text", ""))
-    return texts
+    
+    first = meta[0]
+    article_url = first.get("paper_url")
+    return texts , article_url
 
 
-def make_prompt(article_id: str, top_texts: list[str]) -> str:
-    prompt = f"Summarize the following article ({article_id}) based on these key passages. Start response with something signifying your summarizing an article:\n\n"
+def make_prompt(article_id: str, top_texts: list[str], article_url: str) -> str:
+    prompt = f"""TASK: Write a summary of the article ({article_id}) using ONLY the passages provided below.
+Guidelines (strict):
+1) On the first line, output exactly (no changes): The article is available at: {article_url}
+2) On the next line(s), output the summary text. (Around 150 words is solid length)
+3) Paraphrase the passages, do NOT copy them verbatim.
+3) Do NOT mention limitations or attempt to access the URL.
+
+PASSAGES: """
+    
     for i, text in enumerate(top_texts, 1):
         prompt += f"Passage {i}:\n{text.strip()}\n\n"
     return prompt
@@ -102,7 +113,7 @@ if __name__ == "__main__":
         
         top5 = get_top5_embeddings(embed_file)
         meta_file = str(Path(embed_file).parent / (Path(embed_file).stem.replace('_vectors', '') + '.jsonl'))
-        texts = top_texts(meta_file, top5)
+        texts, article_url = top_texts(meta_file, top5)
         article_id = Path(embed_file).stem.replace('_vectors', '')
-        prompt = make_prompt(article_id, texts)
+        prompt = make_prompt(article_id, texts, article_url)
         save_summary_prompt(prompt, article_id, ctx.start_utc_time)

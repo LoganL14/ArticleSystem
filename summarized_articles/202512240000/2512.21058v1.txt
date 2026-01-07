@@ -1,3 +1,7 @@
-Article Summary for 2512.21058v1
+The article is available at: https://arxiv.org/pdf/2512.21058v1
 
-(placeholder summary text)
+UniPath, a unified large multimodal model, combines pathology understanding with controllable generation, enabling semantics-driven pathology image generation while preserving understanding. The model features a multi-stream control architecture that includes a high-level semantics stream and a prototype stream for fine-grained morphological control. UniPath achieves strong image fidelity, robust image-text alignment, and superior concept-level controllability in comprehensive evaluations across four-tier evaluation hierarchy.
+
+The model's performance is demonstrated through various metrics, including Visual Fidelity, Text-Image Alignment, Finegrained Semantic Control, and Downstream Task Utility. UniPath outperforms state-of-the-art baselines in these evaluations, showcasing its ability to generate high-quality images with realistic tissue textures and fine-grained morphological details.
+
+The model's controllability is also evaluated through few-shot classification on Kather-CRC-2016, where UniPath demonstrates a clear advantage over the strongest baseline. Human pathologists' preference for UniPath in 74% of cases further underscores its nuanced understanding of pathology. The model's ability to generate images that are closer to real pathology in feature space is also highlighted through LPIPS

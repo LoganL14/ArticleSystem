@@ -17,46 +17,45 @@ import json
 
 
 
+import ollama
 
-# prompt = "Summarize this: The quick brown fox jumps over the lazy dog."
+response = ollama.chat(
+    model="llama3.2:3b",
+    messages=[
+        {"role": "user", "content": "Summarize this: The quick brown fox jumps over the lazy dog."}
+    ]
+)
 
-# def summarize_with_ollama(prompt):
-#     response = requests.post(
-#         "http://localhost:11434/api/generate",
-#         json={
-#             "model": MODEL_ID, "prompt" : prompt, "stream": False, "max_tokens": 50})
-#     print(json.dumps(response.json(), indent=2))
-
-# summarize_with_ollama(prompt)
+print(response["message"]["content"])
 
 
-#load the tokenizer which will convert the prompt into tokens (Each model family has own special tokens)
-print("Loading tokenizer")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
-print("tokenizer loaded")
+# #load the tokenizer which will convert the prompt into tokens (Each model family has own special tokens)
+# print("Loading tokenizer")
+# tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+# print("tokenizer loaded")
 
-#actually loads the model (neural net). This AutoModelForCausalLM is specifically for text generation
-print("Loading Model")
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID, device_map="auto")
-print("Model Loaded")
+# #actually loads the model (neural net). This AutoModelForCausalLM is specifically for text generation
+# print("Loading Model")
+# model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID, device_map="auto")
+# print("Model Loaded")
 
-prompt_text = "Summarize this: The quick brown fox jumps over the lazy dog."
+# prompt_text = "Summarize this: The quick brown fox jumps over the lazy dog."
         
-#runs the tokenizer on my input, meaning each "prompt_text".  Encodes the prompt string into PyTorch tensors, moves to same device
-print("Tokenizing prompt")
-inputs = tokenizer(prompt_text, return_tensors="pt")
-prompt_len = inputs["input_ids"].shape[1]
-print(inputs)
-print("Prompt tokenized")
+# #runs the tokenizer on my input, meaning each "prompt_text".  Encodes the prompt string into PyTorch tensors, moves to same device
+# print("Tokenizing prompt")
+# inputs = tokenizer(prompt_text, return_tensors="pt")
+# prompt_len = inputs["input_ids"].shape[1]
+# print(inputs)
+# print("Prompt tokenized")
 
-#runs the model, use the input, producing new token IDs
-print("Generating summary")
-output = model.generate(**inputs, max_new_tokens=50, do_sample=False)
-print("Summary generated")
+# #runs the model, use the input, producing new token IDs
+# print("Generating summary")
+# output = model.generate(**inputs, max_new_tokens=50, do_sample=False)
+# print("Summary generated")
     
-#turns the output, tokenIDs, into actual text
-summary = tokenizer.decode(output[0], skip_special_tokens=True)
-print(summary)
+# #turns the output, tokenIDs, into actual text
+# summary = tokenizer.decode(output[0], skip_special_tokens=True)
+# print(summary)
 
 
 

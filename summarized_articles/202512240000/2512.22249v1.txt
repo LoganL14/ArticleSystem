@@ -1,0 +1,9 @@
+The article discusses a novel approach to human motion segmentation using Temporal Variational Semantics (TVS). The authors propose a framework that incorporates TVS to efficiently determine the Human Motion Segmentation (HMS) with limited iterations.
+
+The key contributions of the paper are:
+
+1. **Proposition 1**: The optimal solution to problem (2) will align with the true segmentation, assuming frames are distributed across distinct subspaces.
+2. **Theorem 3**: The expected segmentation error satisfies E[Err HMS] ≤ C1pLmin + C2σ2∆2sub, where p is the probability of LLM adjacency errors, Lmin is the minimum segment length, σ2 is the within-segment variance, and ∆2sub is the between-subspace separation.
+3. **Theorem 2**: The proposed framework is robust to occasional LLM misjudgments, as the TVS-induced regularizer preserves overall temporal coherence by enforcing smooth embeddings within segments.
+
+The authors propose a feedback-enabled subspace embedding approach that incorporates TVS to efficiently determine HMS with limited iterations. They introduce a clustering regularizer based on the subspace embedding Z and the indicator matrix Q, which promotes effective grouping while adhering to the constraint
